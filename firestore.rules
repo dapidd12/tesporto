@@ -1,0 +1,43 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: comments
+    // Document ID: auto-generated
+    // Fields:
+    //   - name: string (required, max 50 chars) - The name of the visitor
+    //   - text: string (required, max 500 chars) - The content of the comment
+    //   - createdAt: timestamp (required) - The time the comment was created
+    //
+    // ===============================================================
+
+    // Helper functions
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+    
+    function isValidComment(data) {
+      return hasOnlyAllowedFields(['name', 'text', 'createdAt']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 50 &&
+             data.text is string && data.text.size() > 0 && data.text.size() <= 500 &&
+             data.createdAt is timestamp;
+    }
+
+    match /comments/{commentId} {
+      // Allow anyone to read comments
+      allow read: if true;
+      
+      // Allow anyone to create a comment if it's valid
+      allow create: if isValidComment(request.resource.data) && 
+                    request.resource.data.createdAt == request.time;
+                    
+      // Do not allow updates or deletes from the client
+      allow update, delete: if false;
+    }
+  }
+}
