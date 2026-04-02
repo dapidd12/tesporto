@@ -73,9 +73,9 @@ export default function Comments() {
   };
 
   return (
-    <section id="comments" className="bg-muted/20 px-6 py-8 dark:bg-muted/5 md:px-12">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-8 flex flex-col items-center text-center">
+    <section id="comments" className="relative overflow-hidden bg-gradient-to-b from-background to-muted/30 px-6 py-20 dark:from-background dark:to-muted/10 md:px-12">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-12 flex flex-col items-center text-center">
           <div className="mb-4 flex items-center gap-4">
             <div className="h-[2px] w-8 bg-primary" />
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Buku Tamu</span>
@@ -92,8 +92,8 @@ export default function Comments() {
             viewport={{ once: true }}
             className="md:col-span-5"
           >
-            <form onSubmit={handleSubmit} className="sticky top-24 space-y-4 rounded-[2rem] border border-border bg-card p-6 shadow-sm">
-              <h3 className="text-xl font-display font-bold tracking-tight mb-4 flex items-center gap-2">
+            <form onSubmit={handleSubmit} className="sticky top-28 space-y-5 rounded-[2rem] border border-border/50 bg-card/50 backdrop-blur-xl p-6 shadow-xl shadow-black/5 dark:shadow-black/20">
+              <h3 className="text-xl font-display font-bold tracking-tight mb-2 flex items-center gap-2">
                 <MessageCircle size={20} className="text-primary" />
                 Tinggalkan Pesan
               </h3>
@@ -107,7 +107,7 @@ export default function Comments() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="John Doe"
-                  className="w-full rounded-2xl border border-border bg-muted/20 px-4 py-3 text-sm font-bold outline-none transition-all focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10"
+                  className="w-full rounded-2xl border border-border/50 bg-background/50 px-5 py-4 text-sm font-medium outline-none transition-all placeholder:text-muted-foreground/50 focus:border-primary focus:bg-background focus:ring-4 focus:ring-primary/20"
                 />
               </div>
               
@@ -120,7 +120,7 @@ export default function Comments() {
                   onChange={(e) => setText(e.target.value)}
                   placeholder="Tulis sesuatu yang menarik..."
                   rows={4}
-                  className="w-full rounded-2xl border border-border bg-muted/20 px-4 py-3 text-sm font-bold outline-none transition-all focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10 resize-none"
+                  className="w-full rounded-2xl border border-border/50 bg-background/50 px-5 py-4 text-sm font-medium outline-none transition-all placeholder:text-muted-foreground/50 focus:border-primary focus:bg-background focus:ring-4 focus:ring-primary/20 resize-none"
                 />
               </div>
 
@@ -131,7 +131,7 @@ export default function Comments() {
               <button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-foreground py-4 text-sm font-black uppercase tracking-widest text-background transition-all hover:scale-[1.02] active:scale-95 hover:shadow-xl hover:shadow-primary/20 disabled:opacity-70 disabled:hover:scale-100"
+                className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-sm font-black uppercase tracking-widest text-primary-foreground transition-all hover:scale-[1.02] active:scale-95 hover:shadow-xl hover:shadow-primary/25 disabled:opacity-70 disabled:hover:scale-100 mt-2"
               >
                 {isSubmitting ? 'Mengirim...' : 'Kirim Komentar'} 
                 {!isSubmitting && <Send size={16} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />}
@@ -150,24 +150,24 @@ export default function Comments() {
               <h3 className="text-lg font-bold tracking-tight">{comments.length} Komentar</h3>
             </div>
             
-            <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-4 max-h-[600px] overflow-y-auto pr-4 custom-scrollbar">
               {comments.map((comment, i) => (
                 <motion.div 
                   key={comment.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  className="flex gap-4 rounded-2xl border border-border bg-card p-5 transition-all hover:border-primary/30 hover:shadow-md"
+                  className="group flex gap-4 rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm p-5 transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                     <User size={20} />
                   </div>
                   <div className="space-y-1 flex-1">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-bold text-sm">{comment.name}</h4>
-                      <span className="text-[10px] font-medium text-muted-foreground">{formatDate(comment.createdAt)}</span>
+                      <h4 className="font-bold text-sm text-foreground">{comment.name}</h4>
+                      <span className="text-[10px] font-bold tracking-wider uppercase text-muted-foreground/70">{formatDate(comment.createdAt)}</span>
                     </div>
-                    <p className="text-sm text-muted-foreground leading-relaxed break-words">
+                    <p className="text-sm text-muted-foreground leading-relaxed break-words mt-1">
                       {comment.text}
                     </p>
                   </div>
@@ -175,10 +175,10 @@ export default function Comments() {
               ))}
               
               {comments.length === 0 && (
-                <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-12 text-center text-muted-foreground">
-                  <MessageCircle size={32} className="mb-2 opacity-20" />
-                  <p className="text-sm font-medium">Belum ada komentar.</p>
-                  <p className="text-xs">Jadilah yang pertama meninggalkan pesan!</p>
+                <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border/50 bg-card/30 backdrop-blur-sm py-16 text-center text-muted-foreground">
+                  <MessageCircle size={40} className="mb-4 opacity-20" />
+                  <p className="text-base font-bold text-foreground">Belum ada komentar.</p>
+                  <p className="text-sm mt-1">Jadilah yang pertama meninggalkan pesan!</p>
                 </div>
               )}
             </div>

@@ -41,9 +41,9 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="px-6 py-8 md:px-12">
-      <div className="mx-auto max-w-7xl">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+    <section id="contact" className="relative overflow-hidden bg-background px-6 py-20 md:px-12">
+      <div className="mx-auto max-w-6xl">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-8">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -59,14 +59,14 @@ export default function Contact() {
             <div className="space-y-4">
               <a
                 href={`mailto:${CV_DATA.email}`}
-                className="group flex items-center gap-4 rounded-2xl border border-border bg-card p-6 transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1"
+                className="group flex items-center gap-5 rounded-3xl border border-border/50 bg-card/50 backdrop-blur-sm p-6 transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/5 text-primary transition-all duration-500 group-hover:scale-110 group-hover:bg-primary group-hover:text-white">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-500 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground">
                   <Mail size={24} />
                 </div>
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Email</p>
-                  <p className="text-lg font-bold tracking-tight">{CV_DATA.email}</p>
+                  <p className="text-lg font-bold tracking-tight text-foreground">{CV_DATA.email}</p>
                 </div>
               </a>
 
@@ -74,26 +74,26 @@ export default function Contact() {
                 href={`https://wa.me/${CV_DATA.whatsapp}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center gap-4 rounded-2xl border border-border bg-card p-6 transition-all duration-500 hover:border-green-500/50 hover:shadow-2xl hover:shadow-green-500/10 hover:-translate-y-1"
+                className="group flex items-center gap-5 rounded-3xl border border-border/50 bg-card/50 backdrop-blur-sm p-6 transition-all duration-500 hover:border-green-500/50 hover:shadow-2xl hover:shadow-green-500/10 hover:-translate-y-1"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-500/5 text-green-500 transition-all duration-500 group-hover:scale-110 group-hover:bg-green-500 group-hover:text-white">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-green-500/10 text-green-500 transition-all duration-500 group-hover:scale-110 group-hover:bg-green-500 group-hover:text-white">
                   <MessageSquare size={24} />
                 </div>
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">WhatsApp</p>
-                  <p className="text-lg font-bold tracking-tight">+{CV_DATA.whatsapp}</p>
+                  <p className="text-lg font-bold tracking-tight text-foreground">+{CV_DATA.whatsapp}</p>
                 </div>
               </a>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex gap-4 pt-4">
               {CV_DATA.socials.map((social) => (
                 <a
                   key={social.name}
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-card transition-all duration-500 hover:bg-primary hover:text-white hover:border-primary hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20 active:scale-90"
+                  className="group flex h-14 w-14 items-center justify-center rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-500 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20 active:scale-95"
                   title={social.name}
                 >
                   <div className="transition-transform duration-500 group-hover:scale-110">
@@ -111,7 +111,7 @@ export default function Contact() {
             viewport={{ once: true }}
             className="flex flex-col gap-8"
           >
-            <div className="overflow-hidden rounded-[2rem] border border-border bg-muted/20 grayscale hover:grayscale-0 transition-all duration-700">
+            <div className="overflow-hidden rounded-[2.5rem] border border-border/50 bg-muted/20 shadow-xl shadow-black/5 dark:shadow-black/20 grayscale hover:grayscale-0 transition-all duration-700">
               <iframe
                 src={CV_DATA.mapsEmbed}
                 width="100%"
@@ -123,7 +123,7 @@ export default function Contact() {
               />
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 rounded-[2rem] border border-border bg-card p-8 shadow-sm">
+            <form onSubmit={handleSubmit} className="space-y-5 rounded-[2.5rem] border border-border/50 bg-card/50 backdrop-blur-xl p-8 shadow-xl shadow-black/5 dark:shadow-black/20">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-2">Nama</label>
@@ -133,7 +133,7 @@ export default function Contact() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Dafid Sabria"
-                    className="w-full rounded-2xl border border-border bg-muted/20 px-5 py-4 text-sm font-bold outline-none transition-all focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10"
+                    className="w-full rounded-2xl border border-border/50 bg-background/50 px-5 py-4 text-sm font-medium outline-none transition-all placeholder:text-muted-foreground/50 focus:border-primary focus:bg-background focus:ring-4 focus:ring-primary/20"
                   />
                 </div>
                 <div className="space-y-2">
@@ -144,7 +144,7 @@ export default function Contact() {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="hello@example.com"
-                    className="w-full rounded-2xl border border-border bg-muted/20 px-5 py-4 text-sm font-bold outline-none transition-all focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10"
+                    className="w-full rounded-2xl border border-border/50 bg-background/50 px-5 py-4 text-sm font-medium outline-none transition-all placeholder:text-muted-foreground/50 focus:border-primary focus:bg-background focus:ring-4 focus:ring-primary/20"
                   />
                 </div>
               </div>
@@ -156,13 +156,13 @@ export default function Contact() {
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   placeholder="Ceritakan proyek Anda..."
                   rows={4}
-                  className="w-full rounded-2xl border border-border bg-muted/20 px-5 py-4 text-sm font-bold outline-none transition-all focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10 resize-none"
+                  className="w-full rounded-2xl border border-border/50 bg-background/50 px-5 py-4 text-sm font-medium outline-none transition-all placeholder:text-muted-foreground/50 focus:border-primary focus:bg-background focus:ring-4 focus:ring-primary/20 resize-none"
                 />
               </div>
               <button 
                 type="submit" 
                 disabled={status === 'loading'}
-                className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-foreground py-5 text-sm font-black uppercase tracking-widest text-background transition-all hover:scale-[1.02] active:scale-95 hover:shadow-xl hover:shadow-primary/20 disabled:opacity-70 disabled:hover:scale-100"
+                className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-5 text-sm font-black uppercase tracking-widest text-primary-foreground transition-all hover:scale-[1.02] active:scale-95 hover:shadow-xl hover:shadow-primary/25 disabled:opacity-70 disabled:hover:scale-100 mt-2"
               >
                 {status === 'loading' ? 'Mengirim...' : status === 'success' ? 'Terkirim!' : status === 'error' ? 'Gagal Mengirim' : 'Kirim Pesan'}
                 {status === 'idle' && <Send size={18} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />}
