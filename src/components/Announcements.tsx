@@ -31,26 +31,24 @@ export default function Announcements() {
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ y: -50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: -50, opacity: 0 }}
-        className="relative z-50 w-full bg-primary px-4 py-3 text-primary-foreground shadow-lg"
+        initial={{ x: 100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: 100, opacity: 0 }}
+        className="fixed right-4 top-24 z-50 max-w-sm rounded-2xl border border-border bg-card p-4 shadow-2xl"
       >
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/20">
-              <Bell size={16} />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-bold">{announcements[0].title}</span>
-              <span className="text-xs opacity-90 line-clamp-1">{announcements[0].content}</span>
-            </div>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Bell size={20} />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-bold">{announcements[0].title}</span>
+            <span className="text-xs text-muted-foreground line-clamp-2">{announcements[0].content}</span>
           </div>
           <button
             onClick={() => setVisible(false)}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-white/20 active:scale-95"
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-foreground hover:text-background"
           >
-            <X size={16} />
+            <X size={14} />
           </button>
         </div>
       </motion.div>
