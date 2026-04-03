@@ -4,7 +4,7 @@ import { auth, db } from '../firebase';
 import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, Timestamp } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Plus, Trash2, Edit, Save, X, Briefcase, Award, Bell, Image as ImageIcon, Music } from 'lucide-react';
+import { LogOut, Plus, Trash2, Edit, Save, X, Briefcase, Award, Bell, Image as ImageIcon, Music, User, MessageCircle } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [projects, setProjects] = useState<any[]>([]);
@@ -12,6 +12,22 @@ export default function AdminDashboard() {
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [gallery, setGallery] = useState<any[]>([]);
   const [playlist, setPlaylist] = useState<any[]>([]);
+  const [skills, setSkills] = useState<any[]>([]);
+  const [socials, setSocials] = useState<any[]>([]);
+  const [testimonials, setTestimonials] = useState<any[]>([]);
+  const [comments, setComments] = useState<any[]>([]);
+  const [profile, setProfile] = useState<any>({
+    name: '',
+    nickname: '',
+    location: '',
+    email: '',
+    whatsapp: '',
+    summary: '',
+    status: '',
+    profileImage: '',
+    roles: [],
+    mapsEmbed: ''
+  });
   const [loading, setLoading] = useState(true);
   
   const [isEditingProject, setIsEditingProject] = useState<string | null>(null);
@@ -28,10 +44,19 @@ export default function AdminDashboard() {
   
   const [isEditingSong, setIsEditingSong] = useState<string | null>(null);
   const [editSongForm, setEditSongForm] = useState<any>({});
+
+  const [isEditingSkill, setIsEditingSkill] = useState<string | null>(null);
+  const [editSkillForm, setEditSkillForm] = useState<any>({});
+
+  const [isEditingSocial, setIsEditingSocial] = useState<string | null>(null);
+  const [editSocialForm, setEditSocialForm] = useState<any>({});
+
+  const [isEditingTestimonial, setIsEditingTestimonial] = useState<string | null>(null);
+  const [editTestimonialForm, setEditTestimonialForm] = useState<any>({});
   
   const [confirmDelete, setConfirmDelete] = useState<{id: string, type: string} | null>(null);
   
-  const [activeTab, setActiveTab] = useState<'projects' | 'certificates' | 'announcements' | 'gallery' | 'playlist'>('projects');
+  const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'certificates' | 'skills' | 'socials' | 'testimonials' | 'announcements' | 'gallery' | 'playlist' | 'comments'>('profile');
   
   const navigate = useNavigate();
 
@@ -49,18 +74,32 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [projectsSnap, certsSnap, annSnap, gallerySnap, playlistSnap] = await Promise.all([
+      const [projectsSnap, certsSnap, annSnap, gallerySnap, playlistSnap, skillsSnap, socialsSnap, testimonialsSnap, commentsSnap, profileSnap] = await Promise.all([
         getDocs(collection(db, 'projects')),
         getDocs(collection(db, 'certificates')),
         getDocs(collection(db, 'announcements')),
         getDocs(collection(db, 'gallery')),
-        getDocs(collection(db, 'playlist'))
+        getDocs(collection(db, 'playlist')),
+        getDocs(collection(db, 'skills')),
+        getDocs(collection(db, 'socials')),
+        getDocs(collection(db, 'testimonials')),
+        getDocs(collection(db, 'comments')),
+        getDocs(collection(db, 'settings'))
       ]);
       
       setProjects(projectsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       setCertificates(certsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       setGallery(gallerySnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       setPlaylist(playlistSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setSkills(skillsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setSocials(socialsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setTestimonials(testimonialsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setComments(commentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+
+      const profileDoc = profileSnap.docs.find(d => d.id === 'profile');
+      if (profileDoc) {
+        setProfile({ ...profileDoc.data(), id: profileDoc.id });
+      }
 
       // Check and auto-delete expired announcements
       const now = new Date();
@@ -87,6 +126,125 @@ export default function AdminDashboard() {
   const handleLogout = async () => {
     await signOut(auth);
     navigate('/');
+  };
+
+  // --- Profile ---
+  const saveProfile = async () => {
+    try {
+      const updatedProfile = {
+        ...profile,
+        roles: typeof profile.roles === 'string' ? profile.roles.split(',').map((r: string) => r.trim()).filter(Boolean) : profile.roles
+      };
+      await updateDoc(doc(db, 'settings', 'profile'), updatedProfile);
+      setProfile(updatedProfile);
+      alert("Profil berhasil disimpan!");
+    } catch (error) {
+      console.error("Error updating profile: ", error);
+      // If doc doesn't exist, we might need to setDoc, but updateDoc is safer if we assume it's bootstrapped
+    }
+  };
+
+  // --- Skills ---
+  const handleAddSkill = async () => {
+    const newSkill = {
+      category: "New Category",
+      items: ["Skill 1"],
+      type: "programming",
+      createdAt: new Date()
+    };
+    try {
+      const docRef = await addDoc(collection(db, 'skills'), newSkill);
+      setSkills([{ id: docRef.id, ...newSkill }, ...skills]);
+    } catch (error) {
+      console.error("Error adding skill: ", error);
+    }
+  };
+
+  const startEditSkill = (skill: any) => {
+    setIsEditingSkill(skill.id);
+    setEditSkillForm({ ...skill, items: skill.items?.join(', ') || '' });
+  };
+
+  const saveEditSkill = async () => {
+    try {
+      const updatedData = {
+        ...editSkillForm,
+        items: editSkillForm.items.split(',').map((i: string) => i.trim()).filter(Boolean)
+      };
+      await updateDoc(doc(db, 'skills', isEditingSkill!), updatedData);
+      setSkills(skills.map(s => s.id === isEditingSkill ? { ...updatedData, id: s.id } : s));
+      setIsEditingSkill(null);
+    } catch (error) {
+      console.error("Error updating skill: ", error);
+    }
+  };
+
+  // --- Socials ---
+  const handleAddSocial = async () => {
+    const newSocial = {
+      name: "Instagram",
+      handle: "@username",
+      url: "https://instagram.com/username",
+      createdAt: new Date()
+    };
+    try {
+      const docRef = await addDoc(collection(db, 'socials'), newSocial);
+      setSocials([{ id: docRef.id, ...newSocial }, ...socials]);
+    } catch (error) {
+      console.error("Error adding social: ", error);
+    }
+  };
+
+  const startEditSocial = (social: any) => {
+    setIsEditingSocial(social.id);
+    setEditSocialForm({ ...social });
+  };
+
+  const saveEditSocial = async () => {
+    try {
+      await updateDoc(doc(db, 'socials', isEditingSocial!), editSocialForm);
+      setSocials(socials.map(s => s.id === isEditingSocial ? { ...editSocialForm, id: s.id } : s));
+      setIsEditingSocial(null);
+    } catch (error) {
+      console.error("Error updating social: ", error);
+    }
+  };
+
+  // --- Testimonials ---
+  const handleAddTestimonial = async () => {
+    const newTestimonial = {
+      name: "Nama Pengirim",
+      role: "Jabatan",
+      text: "Isi testimoni",
+      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Test",
+      createdAt: new Date()
+    };
+    try {
+      const docRef = await addDoc(collection(db, 'testimonials'), newTestimonial);
+      setTestimonials([{ id: docRef.id, ...newTestimonial }, ...testimonials]);
+    } catch (error) {
+      console.error("Error adding testimonial: ", error);
+    }
+  };
+
+  const startEditTestimonial = (testimonial: any) => {
+    setIsEditingTestimonial(testimonial.id);
+    setEditTestimonialForm({ ...testimonial });
+  };
+
+  const saveEditTestimonial = async () => {
+    try {
+      await updateDoc(doc(db, 'testimonials', isEditingTestimonial!), editTestimonialForm);
+      setTestimonials(testimonials.map(t => t.id === isEditingTestimonial ? { ...editTestimonialForm, id: t.id } : t));
+      setIsEditingTestimonial(null);
+    } catch (error) {
+      console.error("Error updating testimonial: ", error);
+    }
+  };
+
+  // --- Comments ---
+  const handleDeleteComment = async (id: string) => {
+    setConfirmDelete({ id, type: 'comments' });
   };
 
   // --- Projects ---
@@ -239,6 +397,10 @@ export default function AdminDashboard() {
       if (type === 'announcements') setAnnouncements(announcements.filter(a => a.id !== id));
       if (type === 'gallery') setGallery(gallery.filter(g => g.id !== id));
       if (type === 'playlist') setPlaylist(playlist.filter(s => s.id !== id));
+      if (type === 'skills') setSkills(skills.filter(s => s.id !== id));
+      if (type === 'socials') setSocials(socials.filter(s => s.id !== id));
+      if (type === 'testimonials') setTestimonials(testimonials.filter(t => t.id !== id));
+      if (type === 'comments') setComments(comments.filter(c => c.id !== id));
     } catch (error) {
       console.error("Error deleting document: ", error);
     }
@@ -300,64 +462,176 @@ export default function AdminDashboard() {
   }
 
   return (
-    <section className="min-h-screen px-6 py-24 md:px-12">
+    <section className="min-h-screen px-4 py-12 md:px-12 md:py-24">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-12 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-4xl font-display font-black tracking-tighter">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Kelola konten portofolio Anda</p>
+        <div className="mb-8 flex flex-col gap-6 md:mb-12 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-display font-black tracking-tighter md:text-4xl">Admin Dashboard</h1>
+              <p className="text-xs text-muted-foreground md:text-sm">Kelola konten portofolio Anda</p>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500/10 text-red-500 transition-colors hover:bg-red-500 hover:text-white md:hidden"
+              title="Logout"
+            >
+              <LogOut size={18} />
+            </button>
           </div>
+          
           <button
             onClick={handleLogout}
-            className="flex items-center justify-center gap-2 rounded-full bg-red-500/10 px-6 py-3 text-sm font-bold text-red-500 transition-colors hover:bg-red-500 hover:text-white"
+            className="hidden items-center justify-center gap-2 rounded-full bg-red-500/10 px-6 py-3 text-sm font-bold text-red-500 transition-colors hover:bg-red-500 hover:text-white md:flex"
           >
             <LogOut size={18} /> Logout
           </button>
         </div>
 
-        <div className="mb-8 flex overflow-x-auto pb-2 gap-2 border-b border-border hide-scrollbar">
-          <button
-            onClick={() => setActiveTab('projects')}
-            className={`flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-sm font-bold transition-colors ${activeTab === 'projects' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-          >
-            <Briefcase size={18} /> Projects
-          </button>
-          <button
-            onClick={() => setActiveTab('certificates')}
-            className={`flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-sm font-bold transition-colors ${activeTab === 'certificates' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-          >
-            <Award size={18} /> Certificates
-          </button>
-          <button
-            onClick={() => setActiveTab('announcements')}
-            className={`flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-sm font-bold transition-colors ${activeTab === 'announcements' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-          >
-            <Bell size={18} /> Announcements
-          </button>
-          <button
-            onClick={() => setActiveTab('gallery')}
-            className={`flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-sm font-bold transition-colors ${activeTab === 'gallery' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-          >
-            <ImageIcon size={18} /> Gallery
-          </button>
-          <button
-            onClick={() => setActiveTab('playlist')}
-            className={`flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-sm font-bold transition-colors ${activeTab === 'playlist' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-          >
-            <Music size={18} /> Playlist
-          </button>
+        <div className="mb-8 flex overflow-x-auto pb-4 gap-2 border-b border-border hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+          {[
+            { id: 'profile', label: 'Profil', icon: User },
+            { id: 'projects', label: 'Projects', icon: Briefcase },
+            { id: 'certificates', label: 'Certs', icon: Award },
+            { id: 'skills', label: 'Skills', icon: Plus },
+            { id: 'socials', label: 'Socials', icon: Plus },
+            { id: 'testimonials', label: 'Testimoni', icon: Plus },
+            { id: 'announcements', label: 'News', icon: Bell },
+            { id: 'gallery', label: 'Gallery', icon: ImageIcon },
+            { id: 'playlist', label: 'Music', icon: Music },
+            { id: 'comments', label: 'Comments', icon: MessageCircle },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${
+                activeTab === tab.id 
+                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' 
+                  : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+              }`}
+            >
+              <tab.icon size={14} /> {tab.label}
+            </button>
+          ))}
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-6 md:space-y-8">
+          {activeTab === 'profile' && (
+            <div className="rounded-[1.5rem] border border-border bg-card p-5 shadow-xl md:rounded-[2rem] md:p-8">
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="text-xl font-display font-bold md:text-2xl">Profil Global</h2>
+                <button
+                  onClick={saveProfile}
+                  className="flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
+                >
+                  <Save size={18} /> Simpan Profil
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Nama Lengkap</label>
+                  <input
+                    type="text"
+                    value={profile.name}
+                    onChange={e => setProfile({...profile, name: e.target.value})}
+                    className="rounded-xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Nama Panggilan / Nickname</label>
+                  <input
+                    type="text"
+                    value={profile.nickname}
+                    onChange={e => setProfile({...profile, nickname: e.target.value})}
+                    className="rounded-xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Lokasi</label>
+                  <input
+                    type="text"
+                    value={profile.location}
+                    onChange={e => setProfile({...profile, location: e.target.value})}
+                    className="rounded-xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Status (e.g. Pelajar)</label>
+                  <input
+                    type="text"
+                    value={profile.status}
+                    onChange={e => setProfile({...profile, status: e.target.value})}
+                    className="rounded-xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Email</label>
+                  <input
+                    type="email"
+                    value={profile.email}
+                    onChange={e => setProfile({...profile, email: e.target.value})}
+                    className="rounded-xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">WhatsApp (e.g. 628...)</label>
+                  <input
+                    type="text"
+                    value={profile.whatsapp}
+                    onChange={e => setProfile({...profile, whatsapp: e.target.value})}
+                    className="rounded-xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5 md:col-span-2">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">URL Foto Profil</label>
+                  <input
+                    type="text"
+                    value={profile.profileImage}
+                    onChange={e => setProfile({...profile, profileImage: e.target.value})}
+                    className="rounded-xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5 md:col-span-2">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Ringkasan / Summary</label>
+                  <textarea
+                    value={profile.summary}
+                    onChange={e => setProfile({...profile, summary: e.target.value})}
+                    className="rounded-xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
+                    rows={4}
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5 md:col-span-2">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Roles (pisahkan dengan koma)</label>
+                  <input
+                    type="text"
+                    value={Array.isArray(profile.roles) ? profile.roles.join(', ') : profile.roles}
+                    onChange={e => setProfile({...profile, roles: e.target.value})}
+                    className="rounded-xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
+                    placeholder="Web Developer, Cyber Security, dll"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5 md:col-span-2">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Google Maps Embed URL</label>
+                  <input
+                    type="text"
+                    value={profile.mapsEmbed}
+                    onChange={e => setProfile({...profile, mapsEmbed: e.target.value})}
+                    className="rounded-xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeTab === 'projects' && (
-            <div className="rounded-[2rem] border border-border bg-card p-8 shadow-xl">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-display font-bold">Projects</h2>
+            <div className="rounded-[1.5rem] border border-border bg-card p-5 shadow-xl md:rounded-[2rem] md:p-8">
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="text-xl font-display font-bold md:text-2xl">Projects</h2>
                 <button
                   onClick={handleAddProject}
-                  className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
+                  className="flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
                 >
-                  <Plus size={16} /> Tambah Proyek
+                  <Plus size={18} /> Tambah Proyek
                 </button>
               </div>
 
@@ -448,14 +722,14 @@ export default function AdminDashboard() {
           )}
 
           {activeTab === 'certificates' && (
-            <div className="rounded-[2rem] border border-border bg-card p-8 shadow-xl">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-display font-bold">Certificates</h2>
+            <div className="rounded-[1.5rem] border border-border bg-card p-5 shadow-xl md:rounded-[2rem] md:p-8">
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="text-xl font-display font-bold md:text-2xl">Certificates</h2>
                 <button
                   onClick={handleAddCert}
-                  className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
+                  className="flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
                 >
-                  <Plus size={16} /> Tambah Sertifikat
+                  <Plus size={18} /> Tambah Sertifikat
                 </button>
               </div>
 
@@ -518,15 +792,273 @@ export default function AdminDashboard() {
             </div>
           )}
 
+          {activeTab === 'skills' && (
+            <div className="rounded-[1.5rem] border border-border bg-card p-5 shadow-xl md:rounded-[2rem] md:p-8">
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="text-xl font-display font-bold md:text-2xl">Skills</h2>
+                <button
+                  onClick={handleAddSkill}
+                  className="flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
+                >
+                  <Plus size={18} /> Tambah Kategori Skill
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {skills.map(skill => (
+                  <div key={skill.id} className="flex flex-col gap-4 rounded-2xl border border-border/50 bg-muted/20 p-6">
+                    {isEditingSkill === skill.id ? (
+                      <div className="flex w-full flex-col gap-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold text-muted-foreground">Kategori</label>
+                            <input
+                              type="text"
+                              value={editSkillForm.category}
+                              onChange={e => setEditSkillForm({...editSkillForm, category: e.target.value})}
+                              className="rounded-lg border border-border bg-background p-2.5 text-sm outline-none focus:border-primary"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold text-muted-foreground">Tipe</label>
+                            <select
+                              value={editSkillForm.type}
+                              onChange={e => setEditSkillForm({...editSkillForm, type: e.target.value})}
+                              className="rounded-lg border border-border bg-background p-2.5 text-sm outline-none focus:border-primary"
+                            >
+                              <option value="programming">Programming</option>
+                              <option value="other">Other</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs font-bold text-muted-foreground">Items (pisahkan dengan koma)</label>
+                          <input
+                            type="text"
+                            value={editSkillForm.items}
+                            onChange={e => setEditSkillForm({...editSkillForm, items: e.target.value})}
+                            className="rounded-lg border border-border bg-background p-2.5 text-sm outline-none focus:border-primary"
+                          />
+                        </div>
+                        <div className="mt-2 flex gap-2">
+                          <button onClick={saveEditSkill} className="flex items-center gap-1 rounded-lg bg-green-500 px-4 py-2 text-sm font-bold text-white hover:bg-green-600"><Save size={16} /> Simpan</button>
+                          <button onClick={() => setIsEditingSkill(null)} className="flex items-center gap-1 rounded-lg bg-muted px-4 py-2 text-sm font-bold hover:bg-muted/80"><X size={16} /> Batal</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-xl font-bold">{skill.category}</h3>
+                            <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary uppercase">{skill.type}</span>
+                          </div>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {skill.items?.map((item: string) => (
+                              <span key={item} className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium">{item}</span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button onClick={() => startEditSkill(skill)} className="rounded-full bg-blue-500/10 p-3 text-blue-500 hover:bg-blue-500 hover:text-white"><Edit size={18} /></button>
+                          <button onClick={() => setConfirmDelete({id: skill.id, type: 'skills'})} className="rounded-full bg-red-500/10 p-3 text-red-500 hover:bg-red-500 hover:text-white"><Trash2 size={18} /></button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'socials' && (
+            <div className="rounded-[1.5rem] border border-border bg-card p-5 shadow-xl md:rounded-[2rem] md:p-8">
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="text-xl font-display font-bold md:text-2xl">Social Links</h2>
+                <button
+                  onClick={handleAddSocial}
+                  className="flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
+                >
+                  <Plus size={18} /> Tambah Social
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {socials.map(social => (
+                  <div key={social.id} className="flex flex-col gap-4 rounded-2xl border border-border/50 bg-muted/20 p-6">
+                    {isEditingSocial === social.id ? (
+                      <div className="flex w-full flex-col gap-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold text-muted-foreground">Platform</label>
+                            <input
+                              type="text"
+                              value={editSocialForm.name}
+                              onChange={e => setEditSocialForm({...editSocialForm, name: e.target.value})}
+                              className="rounded-lg border border-border bg-background p-2.5 text-sm outline-none focus:border-primary"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold text-muted-foreground">Handle / Username</label>
+                            <input
+                              type="text"
+                              value={editSocialForm.handle}
+                              onChange={e => setEditSocialForm({...editSocialForm, handle: e.target.value})}
+                              className="rounded-lg border border-border bg-background p-2.5 text-sm outline-none focus:border-primary"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs font-bold text-muted-foreground">URL Profil</label>
+                          <input
+                            type="text"
+                            value={editSocialForm.url}
+                            onChange={e => setEditSocialForm({...editSocialForm, url: e.target.value})}
+                            className="rounded-lg border border-border bg-background p-2.5 text-sm outline-none focus:border-primary"
+                          />
+                        </div>
+                        <div className="mt-2 flex gap-2">
+                          <button onClick={saveEditSocial} className="flex items-center gap-1 rounded-lg bg-green-500 px-4 py-2 text-sm font-bold text-white hover:bg-green-600"><Save size={16} /> Simpan</button>
+                          <button onClick={() => setIsEditingSocial(null)} className="flex items-center gap-1 rounded-lg bg-muted px-4 py-2 text-sm font-bold hover:bg-muted/80"><X size={16} /> Batal</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold">{social.name}</h3>
+                          <p className="text-sm text-muted-foreground">{social.handle}</p>
+                          <p className="text-xs text-primary truncate">{social.url}</p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button onClick={() => startEditSocial(social)} className="rounded-full bg-blue-500/10 p-3 text-blue-500 hover:bg-blue-500 hover:text-white"><Edit size={18} /></button>
+                          <button onClick={() => setConfirmDelete({id: social.id, type: 'socials'})} className="rounded-full bg-red-500/10 p-3 text-red-500 hover:bg-red-500 hover:text-white"><Trash2 size={18} /></button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'testimonials' && (
+            <div className="rounded-[1.5rem] border border-border bg-card p-5 shadow-xl md:rounded-[2rem] md:p-8">
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="text-xl font-display font-bold md:text-2xl">Testimonials</h2>
+                <button
+                  onClick={handleAddTestimonial}
+                  className="flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
+                >
+                  <Plus size={18} /> Tambah Testimoni
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {testimonials.map(testimonial => (
+                  <div key={testimonial.id} className="flex flex-col gap-4 rounded-2xl border border-border/50 bg-muted/20 p-6">
+                    {isEditingTestimonial === testimonial.id ? (
+                      <div className="flex w-full flex-col gap-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold text-muted-foreground">Nama</label>
+                            <input
+                              type="text"
+                              value={editTestimonialForm.name}
+                              onChange={e => setEditTestimonialForm({...editTestimonialForm, name: e.target.value})}
+                              className="rounded-lg border border-border bg-background p-2.5 text-sm outline-none focus:border-primary"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold text-muted-foreground">Role / Jabatan</label>
+                            <input
+                              type="text"
+                              value={editTestimonialForm.role}
+                              onChange={e => setEditTestimonialForm({...editTestimonialForm, role: e.target.value})}
+                              className="rounded-lg border border-border bg-background p-2.5 text-sm outline-none focus:border-primary"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs font-bold text-muted-foreground">URL Foto</label>
+                          <input
+                            type="text"
+                            value={editTestimonialForm.image}
+                            onChange={e => setEditTestimonialForm({...editTestimonialForm, image: e.target.value})}
+                            className="rounded-lg border border-border bg-background p-2.5 text-sm outline-none focus:border-primary"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-xs font-bold text-muted-foreground">Testimoni</label>
+                          <textarea
+                            value={editTestimonialForm.text}
+                            onChange={e => setEditTestimonialForm({...editTestimonialForm, text: e.target.value})}
+                            className="rounded-lg border border-border bg-background p-2.5 text-sm outline-none focus:border-primary"
+                            rows={3}
+                          />
+                        </div>
+                        <div className="mt-2 flex gap-2">
+                          <button onClick={saveEditTestimonial} className="flex items-center gap-1 rounded-lg bg-green-500 px-4 py-2 text-sm font-bold text-white hover:bg-green-600"><Save size={16} /> Simpan</button>
+                          <button onClick={() => setIsEditingTestimonial(null)} className="flex items-center gap-1 rounded-lg bg-muted px-4 py-2 text-sm font-bold hover:bg-muted/80"><X size={16} /> Batal</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div className="flex flex-1 items-center gap-4">
+                          <img src={testimonial.image} alt={testimonial.name} className="h-12 w-12 rounded-full object-cover" />
+                          <div>
+                            <h3 className="text-xl font-bold">{testimonial.name}</h3>
+                            <p className="text-sm text-primary font-bold uppercase tracking-widest">{testimonial.role}</p>
+                            <p className="text-sm text-muted-foreground mt-1 italic">"{testimonial.text}"</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button onClick={() => startEditTestimonial(testimonial)} className="rounded-full bg-blue-500/10 p-3 text-blue-500 hover:bg-blue-500 hover:text-white"><Edit size={18} /></button>
+                          <button onClick={() => setConfirmDelete({id: testimonial.id, type: 'testimonials'})} className="rounded-full bg-red-500/10 p-3 text-red-500 hover:bg-red-500 hover:text-white"><Trash2 size={18} /></button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'comments' && (
+            <div className="rounded-[1.5rem] border border-border bg-card p-5 shadow-xl md:rounded-[2rem] md:p-8">
+              <div className="mb-6">
+                <h2 className="text-xl font-display font-bold md:text-2xl">Moderasi Komentar</h2>
+              </div>
+
+              <div className="space-y-4">
+                {comments.map(comment => (
+                  <div key={comment.id} className="flex flex-col gap-4 rounded-2xl border border-border/50 bg-muted/20 p-6">
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-bold">{comment.name}</h3>
+                          <span className="text-[10px] font-bold text-muted-foreground">{comment.createdAt?.toDate().toLocaleString()}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">{comment.text}</p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button onClick={() => handleDeleteComment(comment.id)} className="rounded-full bg-red-500/10 p-3 text-red-500 hover:bg-red-500 hover:text-white"><Trash2 size={18} /></button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {comments.length === 0 && <p className="text-center text-muted-foreground">Belum ada komentar.</p>}
+              </div>
+            </div>
+          )}
+
           {activeTab === 'announcements' && (
-            <div className="rounded-[2rem] border border-border bg-card p-8 shadow-xl">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-display font-bold">Announcements</h2>
+            <div className="rounded-[1.5rem] border border-border bg-card p-5 shadow-xl md:rounded-[2rem] md:p-8">
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="text-xl font-display font-bold md:text-2xl">Announcements</h2>
                 <button
                   onClick={handleAddAnn}
-                  className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
+                  className="flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
                 >
-                  <Plus size={16} /> Tambah Pengumuman
+                  <Plus size={18} /> Tambah Pengumuman
                 </button>
               </div>
 
@@ -592,14 +1124,14 @@ export default function AdminDashboard() {
           )}
 
           {activeTab === 'gallery' && (
-            <div className="rounded-[2rem] border border-border bg-card p-8 shadow-xl">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-display font-bold">Gallery</h2>
+            <div className="rounded-[1.5rem] border border-border bg-card p-5 shadow-xl md:rounded-[2rem] md:p-8">
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="text-xl font-display font-bold md:text-2xl">Gallery</h2>
                 <button
                   onClick={handleAddGallery}
-                  className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
+                  className="flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
                 >
-                  <Plus size={16} /> Tambah Foto
+                  <Plus size={18} /> Tambah Foto
                 </button>
               </div>
 
@@ -658,14 +1190,14 @@ export default function AdminDashboard() {
           )}
 
           {activeTab === 'playlist' && (
-            <div className="rounded-[2rem] border border-border bg-card p-8 shadow-xl">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-display font-bold">Playlist Musik</h2>
+            <div className="rounded-[1.5rem] border border-border bg-card p-5 shadow-xl md:rounded-[2rem] md:p-8">
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="text-xl font-display font-bold md:text-2xl">Playlist Musik</h2>
                 <button
                   onClick={handleAddSong}
-                  className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
+                  className="flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
                 >
-                  <Plus size={16} /> Tambah Lagu
+                  <Plus size={18} /> Tambah Lagu
                 </button>
               </div>
 

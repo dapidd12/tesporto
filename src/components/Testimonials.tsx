@@ -2,24 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Quote, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useCollection } from '../hooks/useContent';
 
-const TESTIMONIALS = [
+const STATIC_TESTIMONIALS = [
   {
-    id: 1,
+    id: 'static-1',
     name: "Aryapiw",
     role: "Collaborator",
     text: "Bekerja dengan Dafid di proyek SourceLock dan SafeNest sangat luar biasa. Dia memiliki pemahaman yang kuat tentang keamanan siber dan pemrograman.",
     image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aryapiw"
   },
   {
-    id: 2,
+    id: 'static-2',
     name: "Budi Santoso",
     role: "Client",
     text: "Web Builder yang dibuat sangat membantu saya dalam memvisualisasikan ide aplikasi dengan cepat. Sangat direkomendasikan!",
     image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Budi"
   },
   {
-    id: 3,
+    id: 'static-3',
     name: "Siti Rahma",
     role: "Teacher",
     text: "Sebagai siswa kelas 1 SMA, kemampuan Dafid dalam pemrograman dan desain grafis sangat mengesankan. Dia adalah talenta muda yang berbakat.",
@@ -28,8 +29,11 @@ const TESTIMONIALS = [
 ];
 
 export default function Testimonials() {
+  const { data: firestoreTestimonials, loading } = useCollection('testimonials');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+
+  const testimonials = firestoreTestimonials.length > 0 ? firestoreTestimonials : STATIC_TESTIMONIALS;
 
   const slideVariants = {
     enter: (direction: number) => ({
@@ -54,21 +58,26 @@ export default function Testimonials() {
   };
 
   const paginate = (newDirection: number) => {
+    if (testimonials.length === 0) return;
     setDirection(newDirection);
     setCurrentIndex((prevIndex) => {
       let nextIndex = prevIndex + newDirection;
-      if (nextIndex < 0) nextIndex = TESTIMONIALS.length - 1;
-      if (nextIndex >= TESTIMONIALS.length) nextIndex = 0;
+      if (nextIndex < 0) nextIndex = testimonials.length - 1;
+      if (nextIndex >= testimonials.length) nextIndex = 0;
       return nextIndex;
     });
   };
 
   useEffect(() => {
+    if (testimonials.length === 0) return;
     const timer = setInterval(() => {
       paginate(1);
     }, 5000);
     return () => clearInterval(timer);
-  }, [currentIndex]);
+  }, [currentIndex, testimonials.length]);
+
+  if (loading) return null;
+  if (testimonials.length === 0) return null;
 
   return (
     <section id="testimonials" className="relative overflow-hidden bg-background px-6 py-20 md:px-12">
@@ -114,22 +123,22 @@ export default function Testimonials() {
                 <div className="flex flex-col items-center gap-8 md:flex-row md:gap-12">
                   <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-2 border-primary/20 bg-muted/50 p-1 transition-all duration-500 group-hover:border-primary/50 md:h-32 md:w-32">
                     <img 
-                      src={TESTIMONIALS[currentIndex].image} 
-                      alt={TESTIMONIALS[currentIndex].name}
+                      src={testimonials[currentIndex]?.image} 
+                      alt={testimonials[currentIndex]?.name}
                       className="h-full w-full rounded-full object-cover"
                     />
                   </div>
                   
                   <div className="flex flex-col text-center md:text-left">
                     <p className="mb-6 text-lg font-medium leading-relaxed text-foreground/90 md:text-xl">
-                      "{TESTIMONIALS[currentIndex].text}"
+                      "{testimonials[currentIndex]?.text}"
                     </p>
                     <div>
                       <h4 className="text-xl font-display font-black tracking-tight text-foreground">
-                        {TESTIMONIALS[currentIndex].name}
+                        {testimonials[currentIndex]?.name}
                       </h4>
                       <p className="text-sm font-bold uppercase tracking-widest text-primary">
-                        {TESTIMONIALS[currentIndex].role}
+                        {testimonials[currentIndex]?.role}
                       </p>
                     </div>
                   </div>
@@ -157,7 +166,7 @@ export default function Testimonials() {
         
         {/* Indicators */}
         <div className="mt-16 flex justify-center gap-3">
-          {TESTIMONIALS.map((_, index) => (
+          {testimonials.map((_, index) => (
             <button
               key={index}
               onClick={() => {

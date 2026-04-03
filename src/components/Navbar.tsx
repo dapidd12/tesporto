@@ -3,12 +3,17 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Moon, Sun, Menu, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '../lib/utils';
+import { useProfile } from '../hooks/useContent';
+import { CV_DATA } from '../data';
 
 export default function Navbar() {
+  const { profile } = useProfile();
   const [isDark, setIsDark] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+
+  const nickname = profile?.nickname || CV_DATA.nickname;
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -21,18 +26,6 @@ export default function Navbar() {
     else document.documentElement.classList.remove('dark');
   }, [isDark]);
 
-  // Prevent scrolling when mobile menu is open
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [mobileMenuOpen]);
-
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'About', href: '/about' },
@@ -42,103 +35,87 @@ export default function Navbar() {
     { name: 'Contact', href: '/contact' },
   ];
 
+  if (location.pathname === '/admin') return null;
+
   return (
     <>
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
+      <nav
         className={cn(
-          'fixed left-1/2 top-4 z-50 w-[95%] max-w-6xl -translate-x-1/2 transition-all duration-500',
-          isScrolled ? 'top-4' : 'top-6'
+          'fixed left-0 right-0 top-0 z-50 transition-all duration-300',
+          isScrolled ? 'bg-background/80 py-3 shadow-md backdrop-blur-md' : 'bg-transparent py-5'
         )}
       >
-        <div 
-          className={cn(
-            "flex items-center justify-between rounded-full border px-6 py-3 transition-all duration-500",
-            isScrolled 
-              ? "border-border/50 bg-background/80 shadow-lg shadow-black/5 backdrop-blur-xl dark:shadow-black/20" 
-              : "border-transparent bg-transparent"
-          )}
-        >
-          <Link
-            to="/"
-            className="text-base font-display font-black tracking-tighter md:text-lg z-50 relative"
-          >
-            <span className="text-primary">KAI</span>
-            <span className="text-foreground"> DEVELOPER</span>
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
+          <Link to="/" className="text-xl font-display font-black tracking-tighter">
+            <span className="text-primary">KaiDev</span>
           </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden items-center gap-8 lg:flex">
-            {navLinks.map((link, i) => (
+          <div className="hidden items-center gap-8 md:flex">
+            {navLinks.map((link) => (
               <Link
                 key={link.name}
                 to={link.href}
                 className={cn(
-                  "text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105",
-                  location.pathname === link.href ? "text-primary" : "text-muted-foreground hover:text-primary"
+                  "text-xs font-bold uppercase tracking-widest transition-colors",
+                  location.pathname === link.href ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 {link.name}
               </Link>
             ))}
-            <div className="h-4 w-[1px] bg-border mx-2"></div>
-            <Link
-              to="/login"
-              className="group flex h-9 items-center justify-center rounded-full border border-border bg-card px-4 text-[10px] font-black uppercase tracking-widest text-foreground transition-all hover:scale-105 active:scale-95 hover:border-primary/50 hover:text-primary hover:shadow-sm"
-            >
-              Login
-            </Link>
-            <button
-              onClick={() => setIsDark(!isDark)}
-              className="group flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground transition-all hover:scale-110 active:scale-95 hover:border-primary/50 hover:shadow-sm"
-              aria-label="Toggle Dark Mode"
-            >
-              {isDark ? (
-                <Sun size={16} className="transition-transform group-hover:rotate-45" />
-              ) : (
-                <Moon size={16} className="transition-transform group-hover:-rotate-12" />
-              )}
-            </button>
+            <div className="flex items-center gap-4 border-l border-border pl-8">
+              <Link
+                to="/login"
+                className={cn(
+                  "text-xs font-bold uppercase tracking-widest transition-colors",
+                  location.pathname === '/login' ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Admin
+              </Link>
+              <button
+                onClick={() => setIsDark(!isDark)}
+                className="text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {isDark ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
+            </div>
           </div>
 
           {/* Mobile Toggle */}
-          <div className="flex items-center gap-3 lg:hidden z-50 relative">
+          <div className="flex items-center gap-4 md:hidden">
             <button
               onClick={() => setIsDark(!isDark)}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground transition-all active:scale-95"
+              className="text-muted-foreground"
             >
-              {isDark ? <Sun size={16} /> : <Moon size={16} />}
+              {isDark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <button 
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-foreground text-background transition-transform active:scale-95"
-            >
-              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
-      </motion.nav>
+      </nav>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            animate={{ opacity: 1, backdropFilter: "blur(16px)" }}
-            exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 flex h-screen w-full flex-col items-center justify-center bg-background/95 lg:hidden"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed inset-0 z-40 flex flex-col items-center justify-center bg-background/95 backdrop-blur-lg md:hidden"
           >
             <div className="flex flex-col items-center gap-8">
-              {navLinks.map((link, i) => (
+              {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.href}
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
-                    "text-4xl font-display font-black tracking-tighter transition-colors",
-                    location.pathname === link.href ? "text-primary" : "text-foreground hover:text-primary"
+                    "text-2xl font-display font-bold tracking-tight",
+                    location.pathname === link.href ? "text-primary" : "text-foreground"
                   )}
                 >
                   {link.name}
@@ -147,9 +124,9 @@ export default function Navbar() {
               <Link
                 to="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="mt-4 rounded-full bg-primary px-8 py-4 text-sm font-black uppercase tracking-widest text-primary-foreground transition-transform active:scale-95"
+                className="mt-4 text-xl font-bold text-primary"
               >
-                Login Admin
+                Admin
               </Link>
             </div>
           </motion.div>

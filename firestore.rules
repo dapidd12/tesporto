@@ -68,5 +68,23 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAuthenticated();
     }
+
+    // Skills collection
+    match /skills/{skillId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Socials collection
+    match /socials/{socialId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Testimonials collection
+    match /testimonials/{testimonialId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
   }
 }

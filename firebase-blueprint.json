@@ -38,9 +38,59 @@
         "whatsapp": { "type": "string" },
         "summary": { "type": "string" },
         "status": { "type": "string" },
-        "profileImage": { "type": "string" }
+        "profileImage": { "type": "string" },
+        "roles": { "type": "array", "items": { "type": "string" } },
+        "mapsEmbed": { "type": "string" }
       },
       "required": ["name", "email"]
+    },
+    "Skill": {
+      "title": "Skill",
+      "description": "A skill category and its items.",
+      "type": "object",
+      "properties": {
+        "category": { "type": "string" },
+        "items": { "type": "array", "items": { "type": "string" } },
+        "type": { "type": "string", "enum": ["programming", "other"] },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["category", "items", "type", "createdAt"]
+    },
+    "Social": {
+      "title": "Social",
+      "description": "A social media link.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "handle": { "type": "string" },
+        "url": { "type": "string" },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["name", "handle", "url", "createdAt"]
+    },
+    "Testimonial": {
+      "title": "Testimonial",
+      "description": "A user testimonial.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "text": { "type": "string" },
+        "image": { "type": "string" },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["name", "role", "text", "createdAt"]
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "A user comment.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["name", "text", "createdAt"]
     },
     "Announcement": {
       "title": "Announcement",
@@ -90,6 +140,22 @@
     "/settings/profile": {
       "schema": { "$ref": "#/entities/Profile" },
       "description": "Stores global profile settings."
+    },
+    "/skills/{skillId}": {
+      "schema": { "$ref": "#/entities/Skill" },
+      "description": "Stores skills."
+    },
+    "/socials/{socialId}": {
+      "schema": { "$ref": "#/entities/Social" },
+      "description": "Stores social links."
+    },
+    "/testimonials/{testimonialId}": {
+      "schema": { "$ref": "#/entities/Testimonial" },
+      "description": "Stores testimonials."
+    },
+    "/comments/{commentId}": {
+      "schema": { "$ref": "#/entities/Comment" },
+      "description": "Stores user comments."
     },
     "/announcements/{announcementId}": {
       "schema": { "$ref": "#/entities/Announcement" },

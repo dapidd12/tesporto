@@ -1,8 +1,17 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { CV_DATA } from '../data';
+import { useProfile } from '../hooks/useContent';
 
 export default function About() {
+  const { profile, loading } = useProfile();
+
+  if (loading) return null;
+
+  const summary = profile?.summary || CV_DATA.summary;
+  const location = profile?.location || CV_DATA.location;
+  const status = profile?.status || CV_DATA.status;
+
   return (
     <section id="about" className="px-6 py-6 md:px-12">
       <div className="mx-auto max-w-4xl">
@@ -22,17 +31,17 @@ export default function About() {
           </h2>
           
           <p className="text-lg leading-relaxed text-muted-foreground md:text-xl">
-            {CV_DATA.summary}
+            {summary}
           </p>
 
           <div className="grid grid-cols-1 gap-4 pt-6 md:grid-cols-2">
             <div className="group rounded-2xl border border-border bg-card p-6 transition-all hover:border-primary/30 hover:shadow-lg">
               <h3 className="mb-2 text-sm font-black uppercase tracking-widest text-primary">Domisili</h3>
-              <p className="text-lg font-bold text-foreground">{CV_DATA.location}</p>
+              <p className="text-lg font-bold text-foreground">{location}</p>
             </div>
             <div className="group rounded-2xl border border-border bg-card p-6 transition-all hover:border-secondary/30 hover:shadow-lg">
               <h3 className="mb-2 text-sm font-black uppercase tracking-widest text-secondary">Status</h3>
-              <p className="text-lg font-bold text-foreground">{CV_DATA.status}</p>
+              <p className="text-lg font-bold text-foreground">{status}</p>
             </div>
           </div>
         </motion.div>

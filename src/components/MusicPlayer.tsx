@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../firebase';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
-import { Play, Pause, SkipForward, Music } from 'lucide-react';
+import { Play, Pause, Music, Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { cn } from '../lib/utils';
 
 export default function MusicPlayer() {
   const [playlist, setPlaylist] = useState<any[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -33,12 +35,12 @@ export default function MusicPlayer() {
 
     window.addEventListener('click', handleInteraction);
     window.addEventListener('scroll', handleInteraction);
-    window.addEventListener('keydown', handleInteraction);
+    window.addEventListener('touchstart', handleInteraction);
 
     return () => {
       window.removeEventListener('click', handleInteraction);
       window.removeEventListener('scroll', handleInteraction);
-      window.removeEventListener('keydown', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
     };
   }, [hasInteracted, playlist]);
 
@@ -57,14 +59,10 @@ export default function MusicPlayer() {
   }, [isPlaying, currentIndex, playlist]);
 
   const handleEnded = () => {
-    setCurrentIndex((prev) => (prev + 1) % playlist.length);
-    setIsPlaying(true);
-  };
-
-  const handleNext = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentIndex((prev) => (prev + 1) % playlist.length);
-    setIsPlaying(true);
+    if (playlist.length > 0) {
+      setCurrentIndex((prev) => (prev + 1) % playlist.length);
+      setIsPlaying(true);
+    }
   };
 
   const togglePlay = (e: React.MouseEvent) => {
@@ -72,64 +70,101 @@ export default function MusicPlayer() {
     setIsPlaying(!isPlaying);
   };
 
+  const toggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsMuted(!isMuted);
+  };
+
   if (playlist.length === 0) return null;
 
   const currentSong = playlist[currentIndex];
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 md:bottom-6 md:left-6">
+    <div className="fixed bottom-6 left-6 z-[60]">
       <audio
         ref={audioRef}
         src={currentSong?.audioUrl}
         onEnded={handleEnded}
+        muted={isMuted}
       />
       
-      <motion.div 
-        className="flex items-center gap-3 rounded-full border border-border bg-card/80 p-2 shadow-lg backdrop-blur-md cursor-pointer max-w-[calc(100vw-2rem)] md:max-w-md"
-        onClick={() => setIsExpanded(!isExpanded)}
-        layout
-      >
-        <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
-          <Music size={18} className={isPlaying ? "animate-spin-slow" : ""} />
-          {isPlaying && (
-            <span className="absolute right-0 top-0 flex h-3 w-3">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75"></span>
-              <span className="relative inline-flex h-3 w-3 rounded-full bg-white"></span>
-            </span>
+      <div className="flex items-center gap-3">
+        {/* Compact Toggle Button */}
+        <motion.button
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setIsExpanded(!isExpanded)}
+          className={cn(
+            "flex h-12 w-12 items-center justify-center rounded-full border border-border/50 bg-background/80 shadow-lg backdrop-blur-xl transition-all duration-500",
+            isPlaying ? "text-primary border-primary/30" : "text-muted-foreground"
           )}
-        </div>
+        >
+          {isPlaying ? (
+            <div className="flex items-center gap-[2px]">
+              <motion.div
+                animate={{ height: [8, 16, 8] }}
+                transition={{ repeat: Infinity, duration: 0.5, delay: 0 }}
+                className="w-[3px] bg-primary rounded-full"
+              />
+              <motion.div
+                animate={{ height: [12, 20, 12] }}
+                transition={{ repeat: Infinity, duration: 0.5, delay: 0.1 }}
+                className="w-[3px] bg-primary rounded-full"
+              />
+              <motion.div
+                animate={{ height: [10, 18, 10] }}
+                transition={{ repeat: Infinity, duration: 0.5, delay: 0.2 }}
+                className="w-[3px] bg-primary rounded-full"
+              />
+            </div>
+          ) : (
+            <Music size={20} />
+          )}
+        </motion.button>
 
+        {/* Player Controls */}
         <AnimatePresence>
           {isExpanded && (
-            <motion.div 
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 'auto', opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              className="flex items-center gap-4 overflow-hidden pr-4"
+            <motion.div
+              initial={{ x: -20, opacity: 0, scale: 0.95 }}
+              animate={{ x: 0, opacity: 1, scale: 1 }}
+              exit={{ x: -20, opacity: 0, scale: 0.95 }}
+              className="flex items-center gap-4 rounded-full border border-border/50 bg-background/80 p-2 pr-6 shadow-xl backdrop-blur-xl"
+              onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex flex-col whitespace-nowrap">
-                <span className="text-xs font-bold">{currentSong?.title || 'Unknown Title'}</span>
-                <span className="text-[10px] text-muted-foreground">{currentSong?.artist || 'Unknown Artist'}</span>
-              </div>
-              
-              <div className="flex items-center gap-2 border-l border-border/50 pl-4">
-                <button 
+              <div className="flex items-center gap-2">
+                <button
                   onClick={togglePlay}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 active:scale-95"
                 >
-                  {isPlaying ? <Pause size={14} /> : <Play size={14} className="ml-0.5" />}
-                </button>
-                <button 
-                  onClick={handleNext}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-                >
-                  <SkipForward size={14} />
+                  {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" className="ml-1" />}
                 </button>
               </div>
+
+              <div className="flex flex-col min-w-[120px] max-w-[180px]">
+                <span className="text-[10px] font-black uppercase tracking-widest text-primary truncate">
+                  Now Playing
+                </span>
+                <span className="text-xs font-bold text-foreground truncate">
+                  {currentSong?.title}
+                </span>
+                <span className="text-[10px] font-medium text-muted-foreground truncate">
+                  {currentSong?.artist}
+                </span>
+              </div>
+
+              <button
+                onClick={toggleMute}
+                className="p-2 text-muted-foreground hover:text-primary transition-colors"
+              >
+                {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </div>
     </div>
   );
 }

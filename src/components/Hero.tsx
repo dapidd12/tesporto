@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { CV_DATA } from '../data';
+import { useProfile } from '../hooks/useContent';
 import { ArrowDownRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const ROLES = [
-  "Web Developer",
-  "Cyber Security Enthusiast",
-  "Student"
-];
-
 export default function Hero() {
+  const { profile, loading } = useProfile();
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 1000], [0, 200]);
   const y2 = useTransform(scrollY, [0, 1000], [0, -150]);
@@ -19,16 +15,26 @@ export default function Hero() {
   const [currentText, setCurrentText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const roles = profile?.roles || [
+    "Web Developer",
+    "Cyber Security Enthusiast",
+    "Student"
+  ];
+
+  const name = profile?.name || CV_DATA.name;
+  const profileImage = profile?.profileImage || CV_DATA.profileImage;
+
   useEffect(() => {
+    if (loading || !roles.length) return;
     const typeSpeed = isDeleting ? 50 : 100;
-    const currentRole = ROLES[currentRoleIndex];
+    const currentRole = roles[currentRoleIndex];
 
     const timeout = setTimeout(() => {
       if (!isDeleting && currentText === currentRole) {
         setTimeout(() => setIsDeleting(true), 1500);
       } else if (isDeleting && currentText === '') {
         setIsDeleting(false);
-        setCurrentRoleIndex((prev) => (prev + 1) % ROLES.length);
+        setCurrentRoleIndex((prev) => (prev + 1) % roles.length);
       } else {
         setCurrentText(
           currentRole.substring(0, currentText.length + (isDeleting ? -1 : 1))
@@ -37,7 +43,9 @@ export default function Hero() {
     }, typeSpeed);
 
     return () => clearTimeout(timeout);
-  }, [currentText, isDeleting, currentRoleIndex]);
+  }, [currentText, isDeleting, currentRoleIndex, roles, loading]);
+
+  if (loading) return <div className="min-h-[85vh] flex items-center justify-center">Loading...</div>;
 
   return (
     <section className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden px-6 pt-12 text-center md:px-12">
@@ -54,8 +62,8 @@ export default function Hero() {
         <div className="absolute -inset-3 rounded-full bg-gradient-to-tr from-primary to-secondary opacity-20 blur-xl transition-opacity duration-500 group-hover:opacity-40" />
         <div className="relative h-40 w-40 overflow-hidden rounded-full border-2 border-border shadow-2xl transition-transform duration-500 group-hover:scale-105 md:h-56 md:w-56">
           <img
-            src={CV_DATA.profileImage}
-            alt={CV_DATA.name}
+            src={profileImage}
+            alt={name}
             className="h-full w-full object-cover"
             referrerPolicy="no-referrer"
           />
@@ -71,14 +79,14 @@ export default function Hero() {
         <div className="animate-marquee-hero flex shrink-0 items-center">
           {[...Array(4)].map((_, i) => (
             <span key={i} className="mx-8 text-5xl font-display font-black tracking-tighter md:text-8xl text-foreground">
-              {CV_DATA.name.toUpperCase()} •
+              {name.toUpperCase()} •
             </span>
           ))}
         </div>
         <div className="animate-marquee-hero flex shrink-0 items-center">
           {[...Array(4)].map((_, i) => (
             <span key={i} className="mx-8 text-5xl font-display font-black tracking-tighter md:text-8xl text-foreground">
-              {CV_DATA.name.toUpperCase()} •
+              {name.toUpperCase()} •
             </span>
           ))}
         </div>

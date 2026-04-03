@@ -1,13 +1,21 @@
 import React from 'react';
 import { CV_DATA } from '../data';
 import { Link } from 'react-router-dom';
+import { useProfile } from '../hooks/useContent';
 
 export default function Footer() {
+  const { profile, loading } = useProfile();
+
+  if (loading) return null;
+
+  const name = profile?.name || CV_DATA.name;
+  const location = profile?.location || CV_DATA.location;
+
   return (
     <footer className="border-t border-gray-200 px-6 py-6 dark:border-white/10 md:px-12">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 md:flex-row">
         <div className="text-center md:text-left">
-          <p className="text-xl font-display font-bold tracking-tighter">{CV_DATA.name.toUpperCase()}</p>
+          <p className="text-xl font-display font-bold tracking-tighter">{name.toUpperCase()}</p>
           <p className="text-sm text-gray-500">© {new Date().getFullYear()} All Rights Reserved.</p>
         </div>
         
@@ -18,7 +26,7 @@ export default function Footer() {
         </div>
 
         <p className="text-sm text-gray-400">
-          Built in {CV_DATA.location.split(',')[0]}
+          Built in {location.split(',')[0]}
         </p>
       </div>
     </footer>

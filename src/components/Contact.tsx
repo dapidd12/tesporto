@@ -1,18 +1,39 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { CV_DATA } from '../data';
-import { Mail, MessageSquare, Send, Instagram, Music2, MapPin } from 'lucide-react';
+import { useProfile, useCollection } from '../hooks/useContent';
+import { Mail, MessageSquare, Send, Instagram, Music2, MapPin, Github, Linkedin, Twitter, Globe } from 'lucide-react';
+
+const ICON_MAP: Record<string, any> = {
+  'Instagram': Instagram,
+  'Tiktok': Music2,
+  'GitHub': Github,
+  'LinkedIn': Linkedin,
+  'Twitter': Twitter,
+  'Website': Globe,
+  'Telegram': Send
+};
 
 export default function Contact() {
+  const { profile, loading: profileLoading } = useProfile();
+  const { data: firestoreSocials, loading: socialsLoading } = useCollection('socials');
+  
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  if (profileLoading || socialsLoading) return null;
+
+  const email = profile?.email || CV_DATA.email;
+  const whatsapp = profile?.whatsapp || CV_DATA.whatsapp;
+  const mapsEmbed = profile?.mapsEmbed || CV_DATA.mapsEmbed;
+  const socials = firestoreSocials.length > 0 ? firestoreSocials : CV_DATA.socials;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
 
     try {
-      const response = await fetch(`https://formsubmit.co/ajax/${CV_DATA.email}`, {
+      const response = await fetch(`https://formsubmit.co/ajax/${email}`, {
         method: "POST",
         headers: { 
             'Content-Type': 'application/json',
@@ -58,7 +79,7 @@ export default function Contact() {
             
             <div className="space-y-4">
               <a
-                href={`mailto:${CV_DATA.email}`}
+                href={`mailto:${email}`}
                 className="group flex items-center gap-5 rounded-3xl border border-border/50 bg-card/50 backdrop-blur-sm p-6 transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1"
               >
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-500 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground">
@@ -66,12 +87,12 @@ export default function Contact() {
                 </div>
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Email</p>
-                  <p className="text-lg font-bold tracking-tight text-foreground">{CV_DATA.email}</p>
+                  <p className="text-lg font-bold tracking-tight text-foreground">{email}</p>
                 </div>
               </a>
 
               <a
-                href={`https://wa.me/${CV_DATA.whatsapp}`}
+                href={`https://wa.me/${whatsapp}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex items-center gap-5 rounded-3xl border border-border/50 bg-card/50 backdrop-blur-sm p-6 transition-all duration-500 hover:border-green-500/50 hover:shadow-2xl hover:shadow-green-500/10 hover:-translate-y-1"
@@ -81,27 +102,29 @@ export default function Contact() {
                 </div>
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">WhatsApp</p>
-                  <p className="text-lg font-bold tracking-tight text-foreground">+{CV_DATA.whatsapp}</p>
+                  <p className="text-lg font-bold tracking-tight text-foreground">+{whatsapp}</p>
                 </div>
               </a>
             </div>
 
-            <div className="flex gap-4 pt-4">
-              {CV_DATA.socials.map((social) => (
-                <a
-                  key={social.name}
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex h-14 w-14 items-center justify-center rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-500 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20 active:scale-95"
-                  title={social.name}
-                >
-                  <div className="transition-transform duration-500 group-hover:scale-110">
-                    {social.name === 'Instagram' ? <Instagram size={20} /> : 
-                     social.name === 'Tiktok' ? <Music2 size={20} /> : <Send size={20} />}
-                  </div>
-                </a>
-              ))}
+            <div className="flex flex-wrap gap-4 pt-4">
+              {socials.map((social: any) => {
+                const Icon = ICON_MAP[social.name] || Send;
+                return (
+                  <a
+                    key={social.id || social.name}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex h-14 w-14 items-center justify-center rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-500 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20 active:scale-95"
+                    title={social.name}
+                  >
+                    <div className="transition-transform duration-500 group-hover:scale-110">
+                      <Icon size={20} />
+                    </div>
+                  </a>
+                );
+              })}
             </div>
           </motion.div>
 
@@ -113,7 +136,7 @@ export default function Contact() {
           >
             <div className="overflow-hidden rounded-[2.5rem] border border-border/50 bg-muted/20 shadow-xl shadow-black/5 dark:shadow-black/20 grayscale hover:grayscale-0 transition-all duration-700">
               <iframe
-                src={CV_DATA.mapsEmbed}
+                src={mapsEmbed}
                 width="100%"
                 height="300"
                 style={{ border: 0 }}
