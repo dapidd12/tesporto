@@ -1,32 +1,107 @@
 {
   "entities": {
-    "Comment": {
-      "title": "Comment",
-      "description": "A comment left by a visitor on the portfolio.",
+    "Project": {
+      "title": "Project",
+      "description": "A portfolio project.",
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the visitor."
-        },
-        "text": {
-          "type": "string",
-          "description": "The content of the comment."
-        },
-        "createdAt": {
-          "type": "timestamp",
-          "description": "The time the comment was created."
-        }
+        "name": { "type": "string" },
+        "url": { "type": "string" },
+        "description": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "image": { "type": "string" },
+        "createdAt": { "type": "timestamp" }
       },
-      "required": ["name", "text", "createdAt"]
+      "required": ["name", "description", "createdAt"]
+    },
+    "Certificate": {
+      "title": "Certificate",
+      "description": "A certificate or achievement.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "tag": { "type": "string" },
+        "url": { "type": "string" },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["name", "url", "createdAt"]
+    },
+    "Profile": {
+      "title": "Profile",
+      "description": "Global profile information.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "nickname": { "type": "string" },
+        "location": { "type": "string" },
+        "email": { "type": "string" },
+        "whatsapp": { "type": "string" },
+        "summary": { "type": "string" },
+        "status": { "type": "string" },
+        "profileImage": { "type": "string" }
+      },
+      "required": ["name", "email"]
+    },
+    "Announcement": {
+      "title": "Announcement",
+      "description": "News or announcements with expiration.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "expiresAt": { "type": "timestamp" },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["title", "content", "expiresAt", "createdAt"]
+    },
+    "Gallery": {
+      "title": "Gallery",
+      "description": "Image gallery.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["title", "imageUrl", "createdAt"]
+    },
+    "Playlist": {
+      "title": "Playlist",
+      "description": "Background music playlist.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "artist": { "type": "string" },
+        "audioUrl": { "type": "string" },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["title", "audioUrl", "createdAt"]
     }
   },
   "firestore": {
-    "/comments/{commentId}": {
-      "schema": {
-        "$ref": "#/entities/Comment"
-      },
-      "description": "Stores all visitor comments."
+    "/projects/{projectId}": {
+      "schema": { "$ref": "#/entities/Project" },
+      "description": "Stores portfolio projects."
+    },
+    "/certificates/{certificateId}": {
+      "schema": { "$ref": "#/entities/Certificate" },
+      "description": "Stores certificates."
+    },
+    "/settings/profile": {
+      "schema": { "$ref": "#/entities/Profile" },
+      "description": "Stores global profile settings."
+    },
+    "/announcements/{announcementId}": {
+      "schema": { "$ref": "#/entities/Announcement" },
+      "description": "Stores announcements."
+    },
+    "/gallery/{galleryId}": {
+      "schema": { "$ref": "#/entities/Gallery" },
+      "description": "Stores gallery images."
+    },
+    "/playlist/{songId}": {
+      "schema": { "$ref": "#/entities/Playlist" },
+      "description": "Stores background music."
     }
   }
 }

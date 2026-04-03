@@ -1,5 +1,6 @@
 import React from 'react';
 import { CV_DATA } from '../data';
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
@@ -11,9 +12,9 @@ export default function Footer() {
         </div>
         
         <div className="flex gap-8 text-sm font-medium text-gray-500">
-          <a href="#about" className="hover:text-primary">About</a>
-          <a href="#projects" className="hover:text-primary">Projects</a>
-          <a href="#contact" className="hover:text-primary">Contact</a>
+          <Link to="/about" className="hover:text-primary">About</Link>
+          <Link to="/projects" className="hover:text-primary">Projects</Link>
+          <Link to="/contact" className="hover:text-primary">Contact</Link>
         </div>
 
         <p className="text-sm text-gray-400">

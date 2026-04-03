@@ -3,18 +3,10 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // ===============================================================
-    // Assumed Data Model
-    // ===============================================================
-    //
-    // Collection: comments
-    // Document ID: auto-generated
-    // Fields:
-    //   - name: string (required, max 50 chars) - The name of the visitor
-    //   - text: string (required, max 500 chars) - The content of the comment
-    //   - createdAt: timestamp (required) - The time the comment was created
-    //
-    // ===============================================================
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
 
     // Helper functions
     function hasOnlyAllowedFields(fields) {
@@ -36,8 +28,45 @@ service cloud.firestore {
       allow create: if isValidComment(request.resource.data) && 
                     request.resource.data.createdAt == request.time;
                     
-      // Do not allow updates or deletes from the client
-      allow update, delete: if false;
+      // Allow admin to delete comments
+      allow delete: if isAuthenticated();
+      allow update: if false;
+    }
+
+    // Projects collection
+    match /projects/{projectId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Certificates collection
+    match /certificates/{certificateId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Settings collection (for profile)
+    match /settings/{document=**} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Announcements collection
+    match /announcements/{announcementId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Gallery collection
+    match /gallery/{galleryId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Playlist collection
+    match /playlist/{songId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
     }
   }
 }

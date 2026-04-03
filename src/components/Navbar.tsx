@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Moon, Sun, Menu, X } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '../lib/utils';
 
 export default function Navbar() {
   const [isDark, setIsDark] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -32,12 +34,12 @@ export default function Navbar() {
   }, [mobileMenuOpen]);
 
   const navLinks = [
-    { name: 'About', href: '#about' },
-    { name: 'Skills', href: '#skills' },
-    { name: 'Projects', href: '#projects' },
-    { name: 'Certificates', href: '#certificates' },
-    { name: 'Comments', href: '#comments' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Home', href: '/' },
+    { name: 'About', href: '/about' },
+    { name: 'Projects', href: '/projects' },
+    { name: 'Gallery', href: '/gallery' },
+    { name: 'Berita', href: '/berita' },
+    { name: 'Contact', href: '/contact' },
   ];
 
   return (
@@ -58,31 +60,35 @@ export default function Navbar() {
               : "border-transparent bg-transparent"
           )}
         >
-          <motion.a
-            href="#"
-            initial={{ opacity: 0, x: -15 }}
-            animate={{ opacity: 1, x: 0 }}
+          <Link
+            to="/"
             className="text-base font-display font-black tracking-tighter md:text-lg z-50 relative"
           >
             <span className="text-primary">KAI</span>
             <span className="text-foreground"> DEVELOPER</span>
-          </motion.a>
+          </Link>
 
           {/* Desktop Menu */}
           <div className="hidden items-center gap-8 lg:flex">
             {navLinks.map((link, i) => (
-              <motion.a
+              <Link
                 key={link.name}
-                href={link.href}
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="text-[10px] font-black uppercase tracking-widest text-muted-foreground transition-all hover:text-primary hover:scale-105"
+                to={link.href}
+                className={cn(
+                  "text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105",
+                  location.pathname === link.href ? "text-primary" : "text-muted-foreground hover:text-primary"
+                )}
               >
                 {link.name}
-              </motion.a>
+              </Link>
             ))}
             <div className="h-4 w-[1px] bg-border mx-2"></div>
+            <Link
+              to="/login"
+              className="group flex h-9 items-center justify-center rounded-full border border-border bg-card px-4 text-[10px] font-black uppercase tracking-widest text-foreground transition-all hover:scale-105 active:scale-95 hover:border-primary/50 hover:text-primary hover:shadow-sm"
+            >
+              Login
+            </Link>
             <button
               onClick={() => setIsDark(!isDark)}
               className="group flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground transition-all hover:scale-110 active:scale-95 hover:border-primary/50 hover:shadow-sm"
@@ -126,19 +132,25 @@ export default function Navbar() {
           >
             <div className="flex flex-col items-center gap-8">
               {navLinks.map((link, i) => (
-                <motion.a
+                <Link
                   key={link.name}
-                  href={link.href}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ delay: i * 0.05 }}
+                  to={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-4xl font-display font-black tracking-tighter text-foreground transition-colors hover:text-primary"
+                  className={cn(
+                    "text-4xl font-display font-black tracking-tighter transition-colors",
+                    location.pathname === link.href ? "text-primary" : "text-foreground hover:text-primary"
+                  )}
                 >
                   {link.name}
-                </motion.a>
+                </Link>
               ))}
+              <Link
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mt-4 rounded-full bg-primary px-8 py-4 text-sm font-black uppercase tracking-widest text-primary-foreground transition-transform active:scale-95"
+              >
+                Login Admin
+              </Link>
             </div>
           </motion.div>
         )}

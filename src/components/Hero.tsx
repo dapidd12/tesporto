@@ -1,15 +1,46 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { CV_DATA } from '../data';
 import { ArrowDownRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+const ROLES = [
+  "Web Developer",
+  "Cyber Security Enthusiast",
+  "Student"
+];
 
 export default function Hero() {
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 1000], [0, 200]);
   const y2 = useTransform(scrollY, [0, 1000], [0, -150]);
 
+  const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
+  const [currentText, setCurrentText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const typeSpeed = isDeleting ? 50 : 100;
+    const currentRole = ROLES[currentRoleIndex];
+
+    const timeout = setTimeout(() => {
+      if (!isDeleting && currentText === currentRole) {
+        setTimeout(() => setIsDeleting(true), 1500);
+      } else if (isDeleting && currentText === '') {
+        setIsDeleting(false);
+        setCurrentRoleIndex((prev) => (prev + 1) % ROLES.length);
+      } else {
+        setCurrentText(
+          currentRole.substring(0, currentText.length + (isDeleting ? -1 : 1))
+        );
+      }
+    }, typeSpeed);
+
+    return () => clearTimeout(timeout);
+  }, [currentText, isDeleting, currentRoleIndex]);
+
   return (
-    <section className="relative flex min-h-[70vh] flex-col items-center justify-center overflow-hidden px-6 pt-12 text-center md:px-12">
+    <section className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden px-6 pt-12 text-center md:px-12">
       {/* Background Glows */}
       <motion.div style={{ y: y1 }} className="absolute top-1/4 left-1/4 -z-10 h-[400px] w-[400px] rounded-full bg-primary/10 blur-[100px] animate-pulse" />
       <motion.div style={{ y: y2, animationDelay: '1s' }} className="absolute bottom-1/4 right-1/4 -z-10 h-[400px] w-[400px] rounded-full bg-secondary/10 blur-[100px] animate-pulse" />
@@ -18,15 +49,17 @@ export default function Hero() {
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-        className="mb-6 relative"
+        className="mb-8 relative group"
       >
-        <div className="absolute -inset-3 rounded-full bg-gradient-to-tr from-primary to-secondary opacity-10 blur-xl" />
-        <img
-          src={CV_DATA.profileImage}
-          alt={CV_DATA.name}
-          className="relative h-36 w-36 rounded-full object-cover border border-border md:h-48 md:w-48 shadow-xl"
-          referrerPolicy="no-referrer"
-        />
+        <div className="absolute -inset-3 rounded-full bg-gradient-to-tr from-primary to-secondary opacity-20 blur-xl transition-opacity duration-500 group-hover:opacity-40" />
+        <div className="relative h-40 w-40 overflow-hidden rounded-full border-2 border-border shadow-2xl transition-transform duration-500 group-hover:scale-105 md:h-56 md:w-56">
+          <img
+            src={CV_DATA.profileImage}
+            alt={CV_DATA.name}
+            className="h-full w-full object-cover"
+            referrerPolicy="no-referrer"
+          />
+        </div>
       </motion.div>
 
       <motion.div
@@ -61,35 +94,36 @@ export default function Hero() {
         }
       `}</style>
 
-      <motion.p
+      <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, duration: 0.8 }}
-        className="mt-4 text-base font-bold uppercase tracking-[0.2em] text-muted-foreground md:text-lg"
+        className="mt-4 flex h-8 items-center justify-center text-base font-bold uppercase tracking-[0.2em] text-muted-foreground md:text-lg"
       >
-        {CV_DATA.nickname} • {CV_DATA.status}
-      </motion.p>
+        <span>{currentText}</span>
+        <span className="ml-1 inline-block h-5 w-[2px] animate-pulse bg-primary md:h-6" />
+      </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6, duration: 0.8 }}
-        className="mt-6 flex flex-col sm:flex-row gap-4"
+        className="mt-8 flex flex-col sm:flex-row gap-4"
       >
-        <a
-          href="#projects"
+        <Link
+          to="/projects"
           className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-full bg-foreground px-8 py-4 text-xs font-black uppercase tracking-widest text-background transition-all hover:scale-105 active:scale-95"
         >
           <span className="relative z-10">Lihat Proyek</span>
           <ArrowDownRight className="relative z-10 transition-transform group-hover:rotate-45" size={18} />
           <div className="absolute inset-0 -z-0 bg-gradient-to-r from-primary to-secondary opacity-0 transition-opacity group-hover:opacity-100" />
-        </a>
-        <a
-          href="#contact"
+        </Link>
+        <Link
+          to="/contact"
           className="flex items-center justify-center gap-2 rounded-full border border-border bg-card/50 px-8 py-4 text-xs font-black uppercase tracking-widest text-foreground backdrop-blur-sm transition-all hover:bg-card hover:border-foreground/20 active:scale-95"
         >
           Hubungi Saya
-        </a>
+        </Link>
       </motion.div>
 
       <motion.div

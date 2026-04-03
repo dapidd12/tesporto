@@ -1,9 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { CV_DATA } from '../data';
 import { FileText, ExternalLink } from 'lucide-react';
+import { db } from '../firebase';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
 export default function Certificates() {
+  const [certificates, setCertificates] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const q = query(collection(db, 'certificates'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const certsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setCertificates(certsData);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching certificates: ", error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return <div className="py-24 text-center text-muted-foreground">Memuat sertifikat...</div>;
+  }
+
   return (
     <section id="certificates" className="bg-muted/20 px-6 py-8 dark:bg-muted/5 md:px-12">
       <div className="mx-auto max-w-7xl">
@@ -17,7 +40,7 @@ export default function Certificates() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {CV_DATA.certificates.map((cert, i) => {
+          {certificates.map((cert, i) => {
             const isPrimary = i % 2 === 0;
             const colorClass = isPrimary ? 'primary' : 'secondary';
             
@@ -28,27 +51,45 @@ export default function Certificates() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className={`group flex flex-col justify-between rounded-[2rem] border border-border bg-card p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-${colorClass}/10 hover:border-${colorClass}/50`}
+                className={`group flex flex-col justify-between overflow-hidden rounded-[2rem] border border-border bg-card transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-${colorClass}/10 hover:border-${colorClass}/50`}
               >
-                <div>
-                  <div className={`mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-${colorClass}/5 text-${colorClass} transition-all duration-500 group-hover:scale-110 group-hover:bg-${colorClass} group-hover:text-white`}>
-                    <FileText size={24} />
+                <div className="relative aspect-[4/3] w-full overflow-hidden border-b border-border bg-muted/50">
+                  {/* PDF Preview using iframe */}
+                  <div className="absolute inset-0 z-0 opacity-50 transition-opacity duration-500 group-hover:opacity-100">
+                    <iframe
+                      src={`${cert.url}#toolbar=0&navpanes=0&scrollbar=0`}
+                      className="h-[150%] w-[150%] origin-top-left scale-[0.67] pointer-events-none"
+                      title={`${cert.name} Preview`}
+                      tabIndex={-1}
+                    />
                   </div>
-                  <h3 className="mb-6 text-xl font-display font-black tracking-tight">{cert.name}</h3>
+                  <div className="absolute inset-0 z-10 bg-gradient-to-t from-card to-transparent" />
+                  
+                  <div className="absolute left-6 top-6 z-20">
+                    <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-${colorClass}/10 text-${colorClass} backdrop-blur-md transition-all duration-500 group-hover:scale-110 group-hover:bg-${colorClass} group-hover:text-white`}>
+                      <FileText size={24} />
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="flex flex-wrap gap-2">
-                  {cert.links.map((link, index) => (
+
+                <div className="flex flex-col gap-4 p-6">
+                  <div>
+                    <h3 className="text-xl font-display font-black tracking-tight">{cert.name}</h3>
+                    <span className={`mt-2 inline-block rounded-full bg-${colorClass}/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-${colorClass}`}>
+                      {cert.tag}
+                    </span>
+                  </div>
+                  
+                  <div className="mt-2">
                     <a
-                      key={index}
-                      href={link}
+                      href={cert.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 hover:bg-accent hover:text-white hover:border-accent active:scale-95"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-muted/50 px-4 py-3 text-xs font-black uppercase tracking-widest transition-all hover:scale-[1.02] hover:bg-primary hover:text-primary-foreground hover:border-primary active:scale-95"
                     >
-                      Sertifikat {cert.links.length > 1 ? index + 1 : ''} <ExternalLink size={12} />
+                      Lihat Sertifikat <ExternalLink size={14} />
                     </a>
-                  ))}
+                  </div>
                 </div>
               </motion.div>
             );
