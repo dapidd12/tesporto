@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { db } from '../firebase';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { Bell } from 'lucide-react';
+import { handleFirestoreError, OperationType } from '../lib/firestoreError';
 
 export default function News() {
   const [news, setNews] = useState<any[]>([]);
@@ -21,7 +22,7 @@ export default function News() {
       setNews(activeNews);
       setLoading(false);
     }, (error) => {
-      console.error("Error fetching news: ", error);
+      handleFirestoreError(error, OperationType.GET, 'announcements');
       setLoading(false);
     });
 

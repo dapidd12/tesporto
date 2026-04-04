@@ -4,6 +4,7 @@ import { CV_DATA } from '../data';
 import { FileText, ExternalLink } from 'lucide-react';
 import { db } from '../firebase';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { handleFirestoreError, OperationType } from '../lib/firestoreError';
 
 export default function Certificates() {
   const [certificates, setCertificates] = useState<any[]>([]);
@@ -16,7 +17,7 @@ export default function Certificates() {
       setCertificates(certsData);
       setLoading(false);
     }, (error) => {
-      console.error("Error fetching certificates: ", error);
+      handleFirestoreError(error, OperationType.GET, 'certificates');
       setLoading(false);
     });
 

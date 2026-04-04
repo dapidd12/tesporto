@@ -5,6 +5,7 @@ import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, Timestamp } fro
 import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Plus, Trash2, Edit, Save, X, Briefcase, Award, Bell, Image as ImageIcon, Music, User, MessageCircle } from 'lucide-react';
+import { handleFirestoreError, OperationType } from '../lib/firestoreError';
 
 export default function AdminDashboard() {
   const [projects, setProjects] = useState<any[]>([]);
@@ -117,7 +118,7 @@ export default function AdminDashboard() {
       setAnnouncements(validAnnouncements);
 
     } catch (error) {
-      console.error("Error fetching data: ", error);
+      handleFirestoreError(error, OperationType.GET, 'multiple_collections');
     } finally {
       setLoading(false);
     }
@@ -139,7 +140,7 @@ export default function AdminDashboard() {
       setProfile(updatedProfile);
       alert("Profil berhasil disimpan!");
     } catch (error) {
-      console.error("Error updating profile: ", error);
+      handleFirestoreError(error, OperationType.UPDATE, 'settings/profile');
       // If doc doesn't exist, we might need to setDoc, but updateDoc is safer if we assume it's bootstrapped
     }
   };
@@ -156,7 +157,7 @@ export default function AdminDashboard() {
       const docRef = await addDoc(collection(db, 'skills'), newSkill);
       setSkills([{ id: docRef.id, ...newSkill }, ...skills]);
     } catch (error) {
-      console.error("Error adding skill: ", error);
+      handleFirestoreError(error, OperationType.CREATE, 'skills');
     }
   };
 
@@ -175,7 +176,7 @@ export default function AdminDashboard() {
       setSkills(skills.map(s => s.id === isEditingSkill ? { ...updatedData, id: s.id } : s));
       setIsEditingSkill(null);
     } catch (error) {
-      console.error("Error updating skill: ", error);
+      handleFirestoreError(error, OperationType.UPDATE, `skills/${isEditingSkill}`);
     }
   };
 
@@ -191,7 +192,7 @@ export default function AdminDashboard() {
       const docRef = await addDoc(collection(db, 'socials'), newSocial);
       setSocials([{ id: docRef.id, ...newSocial }, ...socials]);
     } catch (error) {
-      console.error("Error adding social: ", error);
+      handleFirestoreError(error, OperationType.CREATE, 'socials');
     }
   };
 
@@ -206,7 +207,7 @@ export default function AdminDashboard() {
       setSocials(socials.map(s => s.id === isEditingSocial ? { ...editSocialForm, id: s.id } : s));
       setIsEditingSocial(null);
     } catch (error) {
-      console.error("Error updating social: ", error);
+      handleFirestoreError(error, OperationType.UPDATE, `socials/${isEditingSocial}`);
     }
   };
 
@@ -223,7 +224,7 @@ export default function AdminDashboard() {
       const docRef = await addDoc(collection(db, 'testimonials'), newTestimonial);
       setTestimonials([{ id: docRef.id, ...newTestimonial }, ...testimonials]);
     } catch (error) {
-      console.error("Error adding testimonial: ", error);
+      handleFirestoreError(error, OperationType.CREATE, 'testimonials');
     }
   };
 
@@ -238,7 +239,7 @@ export default function AdminDashboard() {
       setTestimonials(testimonials.map(t => t.id === isEditingTestimonial ? { ...editTestimonialForm, id: t.id } : t));
       setIsEditingTestimonial(null);
     } catch (error) {
-      console.error("Error updating testimonial: ", error);
+      handleFirestoreError(error, OperationType.UPDATE, `testimonials/${isEditingTestimonial}`);
     }
   };
 
@@ -261,7 +262,7 @@ export default function AdminDashboard() {
       const docRef = await addDoc(collection(db, 'projects'), newProject);
       setProjects([{ id: docRef.id, ...newProject }, ...projects]);
     } catch (error) {
-      console.error("Error adding document: ", error);
+      handleFirestoreError(error, OperationType.CREATE, 'projects');
     }
   };
 
@@ -284,7 +285,7 @@ export default function AdminDashboard() {
       setProjects(projects.map(p => p.id === isEditingProject ? { ...updatedData, id: p.id } : p));
       setIsEditingProject(null);
     } catch (error) {
-      console.error("Error updating document: ", error);
+      handleFirestoreError(error, OperationType.UPDATE, `projects/${isEditingProject}`);
     }
   };
 
@@ -300,7 +301,7 @@ export default function AdminDashboard() {
       const docRef = await addDoc(collection(db, 'certificates'), newCert);
       setCertificates([{ id: docRef.id, ...newCert }, ...certificates]);
     } catch (error) {
-      console.error("Error adding document: ", error);
+      handleFirestoreError(error, OperationType.CREATE, 'certificates');
     }
   };
 
@@ -319,7 +320,7 @@ export default function AdminDashboard() {
       setCertificates(certificates.map(c => c.id === isEditingCert ? { ...editCertForm, id: c.id } : c));
       setIsEditingCert(null);
     } catch (error) {
-      console.error("Error updating document: ", error);
+      handleFirestoreError(error, OperationType.UPDATE, `certificates/${isEditingCert}`);
     }
   };
 
@@ -337,7 +338,7 @@ export default function AdminDashboard() {
       const docRef = await addDoc(collection(db, 'announcements'), newAnn);
       setAnnouncements([{ id: docRef.id, ...newAnn }, ...announcements]);
     } catch (error) {
-      console.error("Error adding document: ", error);
+      handleFirestoreError(error, OperationType.CREATE, 'announcements');
     }
   };
 
@@ -364,7 +365,7 @@ export default function AdminDashboard() {
       setAnnouncements(announcements.map(a => a.id === isEditingAnn ? { ...a, ...updatedData } : a));
       setIsEditingAnn(null);
     } catch (error) {
-      console.error("Error updating document: ", error);
+      handleFirestoreError(error, OperationType.UPDATE, `announcements/${isEditingAnn}`);
     }
   };
 
@@ -379,7 +380,7 @@ export default function AdminDashboard() {
       const docRef = await addDoc(collection(db, 'gallery'), newGallery);
       setGallery([{ id: docRef.id, ...newGallery }, ...gallery]);
     } catch (error) {
-      console.error("Error adding document: ", error);
+      handleFirestoreError(error, OperationType.CREATE, 'gallery');
     }
   };
 
@@ -402,7 +403,7 @@ export default function AdminDashboard() {
       if (type === 'testimonials') setTestimonials(testimonials.filter(t => t.id !== id));
       if (type === 'comments') setComments(comments.filter(c => c.id !== id));
     } catch (error) {
-      console.error("Error deleting document: ", error);
+      handleFirestoreError(error, OperationType.DELETE, `${type}/${id}`);
     }
     setConfirmDelete(null);
   };
@@ -418,7 +419,7 @@ export default function AdminDashboard() {
       setGallery(gallery.map(g => g.id === isEditingGallery ? { ...editGalleryForm, id: g.id } : g));
       setIsEditingGallery(null);
     } catch (error) {
-      console.error("Error updating document: ", error);
+      handleFirestoreError(error, OperationType.UPDATE, `gallery/${isEditingGallery}`);
     }
   };
 
@@ -434,7 +435,7 @@ export default function AdminDashboard() {
       const docRef = await addDoc(collection(db, 'playlist'), newSong);
       setPlaylist([{ id: docRef.id, ...newSong }, ...playlist]);
     } catch (error) {
-      console.error("Error adding document: ", error);
+      handleFirestoreError(error, OperationType.CREATE, 'playlist');
     }
   };
 
@@ -453,7 +454,7 @@ export default function AdminDashboard() {
       setPlaylist(playlist.map(s => s.id === isEditingSong ? { ...editSongForm, id: s.id } : s));
       setIsEditingSong(null);
     } catch (error) {
-      console.error("Error updating document: ", error);
+      handleFirestoreError(error, OperationType.UPDATE, `playlist/${isEditingSong}`);
     }
   };
 

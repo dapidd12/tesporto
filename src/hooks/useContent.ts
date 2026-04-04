@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { collection, onSnapshot, query, orderBy, doc } from 'firebase/firestore';
+import { handleFirestoreError, OperationType } from '../lib/firestoreError';
 
 export function useProfile() {
   const [profile, setProfile] = useState<any>(null);
@@ -12,6 +13,8 @@ export function useProfile() {
         setProfile({ id: doc.id, ...doc.data() });
       }
       setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, 'settings/profile');
     });
     return () => unsubscribe();
   }, []);
@@ -28,6 +31,8 @@ export function useCollection(collectionName: string, orderField: string = 'crea
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setData(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       setLoading(false);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, collectionName);
     });
     return () => unsubscribe();
   }, [collectionName, orderField]);

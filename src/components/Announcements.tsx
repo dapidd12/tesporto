@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { db } from '../firebase';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { Bell, X } from 'lucide-react';
+import { handleFirestoreError, OperationType } from '../lib/firestoreError';
 
 export default function Announcements() {
   const [announcements, setAnnouncements] = useState<any[]>([]);
@@ -20,7 +21,7 @@ export default function Announcements() {
         });
       setAnnouncements(active);
     }, (error) => {
-      console.error("Error fetching announcements: ", error);
+      handleFirestoreError(error, OperationType.GET, 'announcements');
     });
 
     return () => unsubscribe();

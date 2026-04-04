@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { db } from '../firebase';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { ImageIcon } from 'lucide-react';
+import { handleFirestoreError, OperationType } from '../lib/firestoreError';
 
 export default function Gallery() {
   const [gallery, setGallery] = useState<any[]>([]);
@@ -15,7 +16,7 @@ export default function Gallery() {
       setGallery(galleryData);
       setLoading(false);
     }, (error) => {
-      console.error("Error fetching gallery: ", error);
+      handleFirestoreError(error, OperationType.GET, 'gallery');
       setLoading(false);
     });
 

@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { MessageCircle, Send, User } from 'lucide-react';
 import { collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase';
+import { handleFirestoreError, OperationType } from '../lib/firestoreError';
 
 interface Comment {
   id: string;
@@ -28,7 +29,7 @@ export default function Comments() {
       })) as Comment[];
       setComments(fetchedComments);
     }, (err) => {
-      console.error("Error fetching comments:", err);
+      handleFirestoreError(err, OperationType.GET, 'comments');
       setError("Gagal memuat komentar.");
     });
 
@@ -52,7 +53,7 @@ export default function Comments() {
       setName('');
       setText('');
     } catch (err) {
-      console.error("Error adding comment:", err);
+      handleFirestoreError(err, OperationType.CREATE, 'comments');
       setError("Gagal mengirim komentar. Silakan coba lagi.");
     } finally {
       setIsSubmitting(false);

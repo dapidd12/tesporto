@@ -5,6 +5,7 @@ import { ExternalLink, Search, Filter } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { db } from '../firebase';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { handleFirestoreError, OperationType } from '../lib/firestoreError';
 
 interface ProjectsProps {
   limit?: number;
@@ -24,7 +25,7 @@ export default function Projects({ limit, hideFilter = false }: ProjectsProps) {
       setProjects(projectsData);
       setLoading(false);
     }, (error) => {
-      console.error("Error fetching projects: ", error);
+      handleFirestoreError(error, OperationType.GET, 'projects');
       setLoading(false);
     });
 
