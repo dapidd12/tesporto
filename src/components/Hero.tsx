@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
-import { CV_DATA } from '../data';
 import { useProfile } from '../hooks/useContent';
 import { ArrowDownRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -15,14 +14,10 @@ export default function Hero() {
   const [currentText, setCurrentText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const roles = profile?.roles || [
-    "Web Developer",
-    "Cyber Security Enthusiast",
-    "Student"
-  ];
+  const roles = profile?.roles || [];
 
-  const name = profile?.name || CV_DATA.name;
-  const profileImage = profile?.profileImage || CV_DATA.profileImage;
+  const name = profile?.name || '';
+  const profileImage = profile?.profileImage || '';
 
   useEffect(() => {
     if (loading || !roles.length) return;
@@ -61,12 +56,18 @@ export default function Hero() {
       >
         <div className="absolute -inset-3 rounded-full bg-gradient-to-tr from-primary to-secondary opacity-20 blur-xl transition-opacity duration-500 group-hover:opacity-40" />
         <div className="relative h-40 w-40 overflow-hidden rounded-full border-2 border-border shadow-2xl transition-transform duration-500 group-hover:scale-105 md:h-56 md:w-56">
-          <img
-            src={profileImage}
-            alt={name}
-            className="h-full w-full object-cover"
-            referrerPolicy="no-referrer"
-          />
+          {profileImage ? (
+            <img
+              src={profileImage}
+              alt={name}
+              className="h-full w-full object-cover"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <div className="h-full w-full bg-muted flex items-center justify-center text-4xl font-bold text-muted-foreground">
+              {name ? name[0].toUpperCase() : ''}
+            </div>
+          )}
         </div>
       </motion.div>
 
@@ -133,6 +134,34 @@ export default function Hero() {
           Hubungi Saya
         </Link>
       </motion.div>
+
+      {(profile?.intro || profile?.vision || profile?.mission) && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.8 }}
+          className="mt-16 grid max-w-4xl grid-cols-1 gap-8 text-left md:grid-cols-3"
+        >
+          {profile?.intro && (
+            <div className="rounded-3xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm">
+              <h3 className="mb-3 text-sm font-black uppercase tracking-widest text-primary">Pengenalan</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">{profile.intro}</p>
+            </div>
+          )}
+          {profile?.vision && (
+            <div className="rounded-3xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm">
+              <h3 className="mb-3 text-sm font-black uppercase tracking-widest text-primary">Visi</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">{profile.vision}</p>
+            </div>
+          )}
+          {profile?.mission && (
+            <div className="rounded-3xl border border-border/50 bg-card/30 p-6 backdrop-blur-sm">
+              <h3 className="mb-3 text-sm font-black uppercase tracking-widest text-primary">Misi</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">{profile.mission}</p>
+            </div>
+          )}
+        </motion.div>
+      )}
 
       <motion.div
         initial={{ opacity: 0 }}

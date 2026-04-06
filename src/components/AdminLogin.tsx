@@ -4,6 +4,7 @@ import { auth } from '../firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { Lock, User } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('');
@@ -22,6 +23,7 @@ export default function AdminLogin() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      toast.success('Login berhasil!');
       navigate('/admin');
     } catch (err: any) {
       // If user not found and it's the exact requested credentials, create it
@@ -29,16 +31,20 @@ export default function AdminLogin() {
         if (username === 'kaidev' && password === 'kaidev0010') {
           try {
             await createUserWithEmailAndPassword(auth, email, password);
+            toast.success('Akun admin berhasil dibuat dan login!');
             navigate('/admin');
             return;
           } catch (createErr: any) {
             setError('Gagal membuat akun admin: ' + createErr.message);
+            toast.error('Gagal membuat akun admin');
           }
         } else {
           setError('Username atau password salah.');
+          toast.error('Username atau password salah.');
         }
       } else {
         setError('Terjadi kesalahan: ' + err.message);
+        toast.error('Terjadi kesalahan saat login.');
       }
     } finally {
       setLoading(false);

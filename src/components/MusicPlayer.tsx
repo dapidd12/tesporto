@@ -26,21 +26,27 @@ export default function MusicPlayer() {
 
   // Interaction listener for autoplay
   useEffect(() => {
-    const handleInteraction = () => {
-      if (!hasInteracted && playlist.length > 0) {
-        setHasInteracted(true);
-        setIsPlaying(true);
+    const handleInteraction = async () => {
+      if (!hasInteracted && playlist.length > 0 && audioRef.current) {
+        try {
+          await audioRef.current.play();
+          setHasInteracted(true);
+          setIsPlaying(true);
+        } catch (e) {
+          console.log("Autoplay prevented:", e);
+          // Don't set hasInteracted to true if it failed, so next interaction can try again
+        }
       }
     };
 
     window.addEventListener('click', handleInteraction);
-    window.addEventListener('scroll', handleInteraction);
     window.addEventListener('touchstart', handleInteraction);
+    window.addEventListener('keydown', handleInteraction);
 
     return () => {
       window.removeEventListener('click', handleInteraction);
-      window.removeEventListener('scroll', handleInteraction);
       window.removeEventListener('touchstart', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
     };
   }, [hasInteracted, playlist]);
 
@@ -49,7 +55,7 @@ export default function MusicPlayer() {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.play().catch(e => {
-          console.log("Autoplay prevented:", e);
+          console.log("Play prevented:", e);
           setIsPlaying(false);
         });
       } else {
@@ -83,7 +89,7 @@ export default function MusicPlayer() {
     <div className="fixed bottom-6 left-6 z-[60]">
       <audio
         ref={audioRef}
-        src={currentSong?.audioUrl}
+        src={currentSong?.audioUrl || undefined}
         onEnded={handleEnded}
         muted={isMuted}
       />

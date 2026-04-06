@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { CV_DATA } from '../data';
 import { useProfile } from '../hooks/useContent';
 
 export default function About() {
@@ -8,9 +7,9 @@ export default function About() {
 
   if (loading) return null;
 
-  const summary = profile?.summary || CV_DATA.summary;
-  const location = profile?.location || CV_DATA.location;
-  const status = profile?.status || CV_DATA.status;
+  const summary = profile?.summary || '';
+  const location = profile?.location || '';
+  const status = profile?.status || '';
 
   return (
     <section id="about" className="px-6 py-6 md:px-12">

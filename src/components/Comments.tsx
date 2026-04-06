@@ -4,6 +4,7 @@ import { MessageCircle, Send, User } from 'lucide-react';
 import { collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import { handleFirestoreError, OperationType } from '../lib/firestoreError';
+import { toast } from 'sonner';
 
 interface Comment {
   id: string;
@@ -52,6 +53,7 @@ export default function Comments() {
       
       setName('');
       setText('');
+      toast.success("Komentar berhasil dikirim!");
     } catch (err) {
       handleFirestoreError(err, OperationType.CREATE, 'comments');
       setError("Gagal mengirim komentar. Silakan coba lagi.");

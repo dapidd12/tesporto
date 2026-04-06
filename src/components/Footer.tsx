@@ -1,5 +1,4 @@
 import React from 'react';
-import { CV_DATA } from '../data';
 import { Link } from 'react-router-dom';
 import { useProfile } from '../hooks/useContent';
 
@@ -8,8 +7,8 @@ export default function Footer() {
 
   if (loading) return null;
 
-  const name = profile?.name || CV_DATA.name;
-  const location = profile?.location || CV_DATA.location;
+  const name = profile?.name || '';
+  const location = profile?.location || '';
 
   return (
     <footer className="border-t border-gray-200 px-6 py-6 dark:border-white/10 md:px-12">

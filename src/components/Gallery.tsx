@@ -55,12 +55,18 @@ export default function Gallery() {
                 transition={{ delay: i * 0.1 }}
                 className="group relative mb-6 overflow-hidden rounded-2xl bg-muted"
               >
-                <img
-                  src={item.imageUrl}
-                  alt={item.title}
-                  className="w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  loading="lazy"
-                />
+                {item.imageUrl ? (
+                  <img
+                    src={item.imageUrl}
+                    alt={item.title}
+                    className="w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="flex aspect-square w-full items-center justify-center bg-muted text-muted-foreground">
+                    <ImageIcon size={48} className="opacity-20" />
+                  </div>
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 <div className="absolute bottom-0 left-0 w-full translate-y-4 p-6 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                   <h3 className="text-lg font-bold text-white">{item.title}</h3>

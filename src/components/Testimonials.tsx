@@ -4,36 +4,10 @@ import { Quote, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useCollection } from '../hooks/useContent';
 
-const STATIC_TESTIMONIALS = [
-  {
-    id: 'static-1',
-    name: "Aryapiw",
-    role: "Collaborator",
-    text: "Bekerja dengan Dafid di proyek SourceLock dan SafeNest sangat luar biasa. Dia memiliki pemahaman yang kuat tentang keamanan siber dan pemrograman.",
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aryapiw"
-  },
-  {
-    id: 'static-2',
-    name: "Budi Santoso",
-    role: "Client",
-    text: "Web Builder yang dibuat sangat membantu saya dalam memvisualisasikan ide aplikasi dengan cepat. Sangat direkomendasikan!",
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Budi"
-  },
-  {
-    id: 'static-3',
-    name: "Siti Rahma",
-    role: "Teacher",
-    text: "Sebagai siswa kelas 1 SMA, kemampuan Dafid dalam pemrograman dan desain grafis sangat mengesankan. Dia adalah talenta muda yang berbakat.",
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Siti"
-  }
-];
-
 export default function Testimonials() {
-  const { data: firestoreTestimonials, loading } = useCollection('testimonials');
+  const { data: testimonials, loading } = useCollection('testimonials');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
-
-  const testimonials = firestoreTestimonials.length > 0 ? firestoreTestimonials : STATIC_TESTIMONIALS;
 
   const slideVariants = {
     enter: (direction: number) => ({
@@ -122,11 +96,17 @@ export default function Testimonials() {
                 
                 <div className="flex flex-col items-center gap-8 md:flex-row md:gap-12">
                   <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-2 border-primary/20 bg-muted/50 p-1 transition-all duration-500 group-hover:border-primary/50 md:h-32 md:w-32">
-                    <img 
-                      src={testimonials[currentIndex]?.image} 
-                      alt={testimonials[currentIndex]?.name}
-                      className="h-full w-full rounded-full object-cover"
-                    />
+                    {testimonials[currentIndex]?.image ? (
+                      <img 
+                        src={testimonials[currentIndex]?.image} 
+                        alt={testimonials[currentIndex]?.name}
+                        className="h-full w-full rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-full w-full rounded-full bg-muted flex items-center justify-center text-2xl font-bold text-muted-foreground">
+                        {testimonials[currentIndex]?.name?.[0]?.toUpperCase()}
+                      </div>
+                    )}
                   </div>
                   
                   <div className="flex flex-col text-center md:text-left">

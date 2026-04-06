@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { CV_DATA } from '../data';
 import { useProfile, useCollection } from '../hooks/useContent';
 import { Mail, MessageSquare, Send, Instagram, Music2, MapPin, Github, Linkedin, Twitter, Globe } from 'lucide-react';
 
@@ -23,10 +22,10 @@ export default function Contact() {
 
   if (profileLoading || socialsLoading) return null;
 
-  const email = profile?.email || CV_DATA.email;
-  const whatsapp = profile?.whatsapp || CV_DATA.whatsapp;
-  const mapsEmbed = profile?.mapsEmbed || CV_DATA.mapsEmbed;
-  const socials = firestoreSocials.length > 0 ? firestoreSocials : CV_DATA.socials;
+  const email = profile?.email || '';
+  const whatsapp = profile?.whatsapp || '';
+  const mapsEmbed = profile?.mapsEmbed || '';
+  const socials = firestoreSocials;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,15 +134,21 @@ export default function Contact() {
             className="flex flex-col gap-8"
           >
             <div className="overflow-hidden rounded-[2.5rem] border border-border/50 bg-muted/20 shadow-xl shadow-black/5 dark:shadow-black/20 grayscale hover:grayscale-0 transition-all duration-700">
-              <iframe
-                src={mapsEmbed}
-                width="100%"
-                height="300"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
+              {mapsEmbed ? (
+                <iframe
+                  src={mapsEmbed}
+                  width="100%"
+                  height="300"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              ) : (
+                <div className="flex h-[300px] w-full items-center justify-center bg-muted text-muted-foreground">
+                  Peta tidak tersedia
+                </div>
+              )}
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5 rounded-[2.5rem] border border-border/50 bg-card/50 backdrop-blur-xl p-8 shadow-xl shadow-black/5 dark:shadow-black/20">

@@ -29,6 +29,8 @@ import News from './components/News';
 import MusicPlayer from './components/MusicPlayer';
 import { AnimatePresence } from 'motion/react';
 
+import { Toaster } from 'sonner';
+
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   React.useEffect(() => {
@@ -112,6 +114,7 @@ export default function App() {
     <Router>
       <SmoothScroll>
         <div className="relative min-h-screen overflow-x-hidden selection:bg-primary selection:text-white">
+          <Toaster position="top-center" richColors />
           <Preloader />
           <CustomCursor />
           <Announcements />

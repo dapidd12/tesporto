@@ -8,6 +8,15 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && 
+        (
+          (request.auth.token.email == "saqilakhalifah@gmail.com" && request.auth.token.email_verified == true) ||
+          (request.auth.token.email == "kaidev@admin.com")
+        );
+    }
+
     // Helper functions
     function hasOnlyAllowedFields(fields) {
       return request.resource.data.keys().hasOnly(fields);
@@ -29,62 +38,78 @@ service cloud.firestore {
                     request.resource.data.createdAt == request.time;
                     
       // Allow admin to delete comments
-      allow delete: if isAuthenticated();
+      allow delete: if isAdmin();
+      allow update: if false;
+    }
+
+    function isValidProjectComment(data) {
+      return hasOnlyAllowedFields(['projectId', 'name', 'text', 'createdAt']) &&
+             data.projectId is string && data.projectId.size() > 0 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 50 &&
+             data.text is string && data.text.size() > 0 && data.text.size() <= 500 &&
+             data.createdAt is timestamp;
+    }
+
+    match /project_comments/{commentId} {
+      allow read: if true;
+      allow create: if isValidProjectComment(request.resource.data) && 
+                    request.resource.data.createdAt == request.time;
+      allow delete: if isAdmin();
       allow update: if false;
     }
 
     // Projects collection
     match /projects/{projectId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isAdmin();
     }
 
     // Certificates collection
     match /certificates/{certificateId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isAdmin();
     }
 
     // Settings collection (for profile)
     match /settings/{document=**} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isAdmin();
     }
 
     // Announcements collection
     match /announcements/{announcementId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isAdmin();
     }
 
     // Gallery collection
     match /gallery/{galleryId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isAdmin();
     }
 
     // Playlist collection
     match /playlist/{songId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isAdmin();
     }
 
     // Skills collection
     match /skills/{skillId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isAdmin();
     }
 
     // Socials collection
     match /socials/{socialId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isAdmin();
     }
 
     // Testimonials collection
     match /testimonials/{testimonialId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isAdmin();
     }
   }
 }

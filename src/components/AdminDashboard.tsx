@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { auth, db } from '../firebase';
-import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, Timestamp } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Plus, Trash2, Edit, Save, X, Briefcase, Award, Bell, Image as ImageIcon, Music, User, MessageCircle } from 'lucide-react';
 import { handleFirestoreError, OperationType } from '../lib/firestoreError';
+import { toast } from 'sonner';
 
 export default function AdminDashboard() {
   const [projects, setProjects] = useState<any[]>([]);
@@ -27,7 +28,11 @@ export default function AdminDashboard() {
     status: '',
     profileImage: '',
     roles: [],
-    mapsEmbed: ''
+    mapsEmbed: '',
+    vision: '',
+    mission: '',
+    intro: '',
+    marqueeSpeed: 30
   });
   const [loading, setLoading] = useState(true);
   
@@ -126,6 +131,7 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     await signOut(auth);
+    toast.success("Berhasil logout!");
     navigate('/');
   };
 
@@ -136,12 +142,11 @@ export default function AdminDashboard() {
         ...profile,
         roles: typeof profile.roles === 'string' ? profile.roles.split(',').map((r: string) => r.trim()).filter(Boolean) : profile.roles
       };
-      await updateDoc(doc(db, 'settings', 'profile'), updatedProfile);
+      await setDoc(doc(db, 'settings', 'profile'), updatedProfile, { merge: true });
       setProfile(updatedProfile);
-      alert("Profil berhasil disimpan!");
+      toast.success("Profil berhasil disimpan!");
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, 'settings/profile');
-      // If doc doesn't exist, we might need to setDoc, but updateDoc is safer if we assume it's bootstrapped
     }
   };
 
@@ -156,6 +161,7 @@ export default function AdminDashboard() {
     try {
       const docRef = await addDoc(collection(db, 'skills'), newSkill);
       setSkills([{ id: docRef.id, ...newSkill }, ...skills]);
+      toast.success("Skill berhasil ditambahkan!");
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'skills');
     }
@@ -175,6 +181,7 @@ export default function AdminDashboard() {
       await updateDoc(doc(db, 'skills', isEditingSkill!), updatedData);
       setSkills(skills.map(s => s.id === isEditingSkill ? { ...updatedData, id: s.id } : s));
       setIsEditingSkill(null);
+      toast.success("Skill berhasil diperbarui!");
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `skills/${isEditingSkill}`);
     }
@@ -191,6 +198,7 @@ export default function AdminDashboard() {
     try {
       const docRef = await addDoc(collection(db, 'socials'), newSocial);
       setSocials([{ id: docRef.id, ...newSocial }, ...socials]);
+      toast.success("Social media berhasil ditambahkan!");
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'socials');
     }
@@ -206,6 +214,7 @@ export default function AdminDashboard() {
       await updateDoc(doc(db, 'socials', isEditingSocial!), editSocialForm);
       setSocials(socials.map(s => s.id === isEditingSocial ? { ...editSocialForm, id: s.id } : s));
       setIsEditingSocial(null);
+      toast.success("Social media berhasil diperbarui!");
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `socials/${isEditingSocial}`);
     }
@@ -223,6 +232,7 @@ export default function AdminDashboard() {
     try {
       const docRef = await addDoc(collection(db, 'testimonials'), newTestimonial);
       setTestimonials([{ id: docRef.id, ...newTestimonial }, ...testimonials]);
+      toast.success("Testimoni berhasil ditambahkan!");
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'testimonials');
     }
@@ -238,6 +248,7 @@ export default function AdminDashboard() {
       await updateDoc(doc(db, 'testimonials', isEditingTestimonial!), editTestimonialForm);
       setTestimonials(testimonials.map(t => t.id === isEditingTestimonial ? { ...editTestimonialForm, id: t.id } : t));
       setIsEditingTestimonial(null);
+      toast.success("Testimoni berhasil diperbarui!");
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `testimonials/${isEditingTestimonial}`);
     }
@@ -261,6 +272,7 @@ export default function AdminDashboard() {
     try {
       const docRef = await addDoc(collection(db, 'projects'), newProject);
       setProjects([{ id: docRef.id, ...newProject }, ...projects]);
+      toast.success("Project berhasil ditambahkan!");
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'projects');
     }
@@ -284,6 +296,7 @@ export default function AdminDashboard() {
       await updateDoc(doc(db, 'projects', isEditingProject!), updatedData);
       setProjects(projects.map(p => p.id === isEditingProject ? { ...updatedData, id: p.id } : p));
       setIsEditingProject(null);
+      toast.success("Project berhasil diperbarui!");
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `projects/${isEditingProject}`);
     }
@@ -300,6 +313,7 @@ export default function AdminDashboard() {
     try {
       const docRef = await addDoc(collection(db, 'certificates'), newCert);
       setCertificates([{ id: docRef.id, ...newCert }, ...certificates]);
+      toast.success("Sertifikat berhasil ditambahkan!");
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'certificates');
     }
@@ -319,6 +333,7 @@ export default function AdminDashboard() {
       await updateDoc(doc(db, 'certificates', isEditingCert!), editCertForm);
       setCertificates(certificates.map(c => c.id === isEditingCert ? { ...editCertForm, id: c.id } : c));
       setIsEditingCert(null);
+      toast.success("Sertifikat berhasil diperbarui!");
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `certificates/${isEditingCert}`);
     }
@@ -337,6 +352,7 @@ export default function AdminDashboard() {
     try {
       const docRef = await addDoc(collection(db, 'announcements'), newAnn);
       setAnnouncements([{ id: docRef.id, ...newAnn }, ...announcements]);
+      toast.success("Pengumuman berhasil ditambahkan!");
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'announcements');
     }
@@ -364,6 +380,7 @@ export default function AdminDashboard() {
       await updateDoc(doc(db, 'announcements', isEditingAnn!), updatedData);
       setAnnouncements(announcements.map(a => a.id === isEditingAnn ? { ...a, ...updatedData } : a));
       setIsEditingAnn(null);
+      toast.success("Pengumuman berhasil diperbarui!");
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `announcements/${isEditingAnn}`);
     }
@@ -379,6 +396,7 @@ export default function AdminDashboard() {
     try {
       const docRef = await addDoc(collection(db, 'gallery'), newGallery);
       setGallery([{ id: docRef.id, ...newGallery }, ...gallery]);
+      toast.success("Foto berhasil ditambahkan!");
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'gallery');
     }
@@ -402,6 +420,7 @@ export default function AdminDashboard() {
       if (type === 'socials') setSocials(socials.filter(s => s.id !== id));
       if (type === 'testimonials') setTestimonials(testimonials.filter(t => t.id !== id));
       if (type === 'comments') setComments(comments.filter(c => c.id !== id));
+      toast.success("Data berhasil dihapus!");
     } catch (error) {
       handleFirestoreError(error, OperationType.DELETE, `${type}/${id}`);
     }
@@ -418,6 +437,7 @@ export default function AdminDashboard() {
       await updateDoc(doc(db, 'gallery', isEditingGallery!), editGalleryForm);
       setGallery(gallery.map(g => g.id === isEditingGallery ? { ...editGalleryForm, id: g.id } : g));
       setIsEditingGallery(null);
+      toast.success("Foto berhasil diperbarui!");
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `gallery/${isEditingGallery}`);
     }
@@ -434,6 +454,7 @@ export default function AdminDashboard() {
     try {
       const docRef = await addDoc(collection(db, 'playlist'), newSong);
       setPlaylist([{ id: docRef.id, ...newSong }, ...playlist]);
+      toast.success("Lagu berhasil ditambahkan!");
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'playlist');
     }
@@ -453,6 +474,7 @@ export default function AdminDashboard() {
       await updateDoc(doc(db, 'playlist', isEditingSong!), editSongForm);
       setPlaylist(playlist.map(s => s.id === isEditingSong ? { ...editSongForm, id: s.id } : s));
       setIsEditingSong(null);
+      toast.success("Lagu berhasil diperbarui!");
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, `playlist/${isEditingSong}`);
     }
@@ -617,6 +639,42 @@ export default function AdminDashboard() {
                     type="text"
                     value={profile.mapsEmbed}
                     onChange={e => setProfile({...profile, mapsEmbed: e.target.value})}
+                    className="rounded-xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5 md:col-span-2">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Pengenalan Singkat</label>
+                  <textarea
+                    value={profile.intro || ''}
+                    onChange={e => setProfile({...profile, intro: e.target.value})}
+                    className="rounded-xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
+                    rows={3}
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Visi</label>
+                  <textarea
+                    value={profile.vision || ''}
+                    onChange={e => setProfile({...profile, vision: e.target.value})}
+                    className="rounded-xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
+                    rows={4}
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Misi</label>
+                  <textarea
+                    value={profile.mission || ''}
+                    onChange={e => setProfile({...profile, mission: e.target.value})}
+                    className="rounded-xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
+                    rows={4}
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5 md:col-span-2">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Kecepatan Running Text (detik)</label>
+                  <input
+                    type="number"
+                    value={profile.marqueeSpeed || 30}
+                    onChange={e => setProfile({...profile, marqueeSpeed: Number(e.target.value)})}
                     className="rounded-xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
                   />
                 </div>
@@ -1004,7 +1062,13 @@ export default function AdminDashboard() {
                     ) : (
                       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                         <div className="flex flex-1 items-center gap-4">
-                          <img src={testimonial.image} alt={testimonial.name} className="h-12 w-12 rounded-full object-cover" />
+                          {testimonial.image ? (
+                            <img src={testimonial.image} alt={testimonial.name} className="h-12 w-12 rounded-full object-cover" />
+                          ) : (
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-lg font-bold text-muted-foreground">
+                              {testimonial.name?.[0]?.toUpperCase()}
+                            </div>
+                          )}
                           <div>
                             <h3 className="text-xl font-bold">{testimonial.name}</h3>
                             <p className="text-sm text-primary font-bold uppercase tracking-widest">{testimonial.role}</p>

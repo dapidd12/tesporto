@@ -4,7 +4,6 @@ import { Moon, Sun, Menu, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { useProfile } from '../hooks/useContent';
-import { CV_DATA } from '../data';
 
 export default function Navbar() {
   const { profile } = useProfile();
@@ -13,7 +12,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
-  const nickname = profile?.nickname || CV_DATA.nickname;
+  const nickname = profile?.nickname || '';
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -47,7 +46,7 @@ export default function Navbar() {
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
           <Link to="/" className="text-xl font-display font-black tracking-tighter">
-            <span className="text-primary">KaiDev</span>
+            <span className="text-primary">KaiDeveloper</span>
           </Link>
 
           {/* Desktop Menu */}

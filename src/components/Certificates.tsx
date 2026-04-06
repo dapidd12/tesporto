@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { CV_DATA } from '../data';
 import { FileText, ExternalLink } from 'lucide-react';
 import { db } from '../firebase';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
@@ -57,12 +56,14 @@ export default function Certificates() {
                 <div className="relative aspect-[4/3] w-full overflow-hidden border-b border-border bg-muted/50">
                   {/* PDF Preview using iframe */}
                   <div className="absolute inset-0 z-0 opacity-50 transition-opacity duration-500 group-hover:opacity-100">
-                    <iframe
-                      src={`${cert.url}#toolbar=0&navpanes=0&scrollbar=0`}
-                      className="h-[150%] w-[150%] origin-top-left scale-[0.67] pointer-events-none"
-                      title={`${cert.name} Preview`}
-                      tabIndex={-1}
-                    />
+                    {cert.url && (
+                      <iframe
+                        src={`${cert.url}#toolbar=0&navpanes=0&scrollbar=0`}
+                        className="h-[150%] w-[150%] origin-top-left scale-[0.67] pointer-events-none"
+                        title={`${cert.name} Preview`}
+                        tabIndex={-1}
+                      />
+                    )}
                   </div>
                   <div className="absolute inset-0 z-10 bg-gradient-to-t from-card to-transparent" />
                   

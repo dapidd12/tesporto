@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CV_DATA } from '../data';
 import { ExternalLink, Search, Filter } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { db } from '../firebase';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../lib/firestoreError';
+import ProjectComments from './ProjectComments';
 
 interface ProjectsProps {
   limit?: number;
@@ -182,6 +182,7 @@ export default function Projects({ limit, hideFilter = false }: ProjectsProps) {
                       View Live <ExternalLink size={16} />
                     </a>
                   </div>
+                  <ProjectComments projectId={project.id} />
                 </div>
               </motion.div>
             ))}
