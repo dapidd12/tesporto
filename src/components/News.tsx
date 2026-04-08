@@ -59,15 +59,15 @@ export default function News() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6 shadow-lg md:p-8"
+                className="glass-card flex flex-col gap-4 rounded-[2rem] p-6 shadow-lg md:p-8 transition-transform hover:-translate-y-1 duration-500"
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-border/50 pb-4 gap-2">
-                  <h3 className="text-2xl font-bold">{item.title}</h3>
-                  <span className="text-xs font-bold text-muted-foreground whitespace-nowrap">
+                  <h3 className="text-2xl font-display font-bold text-primary">{item.title}</h3>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground whitespace-nowrap bg-muted/50 px-3 py-1 rounded-full">
                     {item.createdAt?.toDate().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </span>
                 </div>
-                <p className="whitespace-pre-wrap text-muted-foreground leading-relaxed">{item.content}</p>
+                <p className="whitespace-pre-wrap text-muted-foreground leading-relaxed text-sm">{item.content}</p>
               </motion.div>
             ))}
           </div>

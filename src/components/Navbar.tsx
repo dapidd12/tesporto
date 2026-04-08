@@ -40,34 +40,34 @@ export default function Navbar() {
     <>
       <nav
         className={cn(
-          'fixed left-0 right-0 top-0 z-50 transition-all duration-300',
-          isScrolled ? 'bg-background/80 py-3 shadow-md backdrop-blur-md' : 'bg-transparent py-5'
+          'fixed left-0 right-0 top-0 z-50 transition-all duration-500',
+          isScrolled ? 'bg-background/60 py-3 shadow-lg shadow-black/5 backdrop-blur-xl border-b border-border/50' : 'bg-transparent py-6'
         )}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
-          <Link to="/" className="text-xl font-display font-black tracking-tighter">
-            <span className="text-primary">KaiDeveloper</span>
+          <Link to="/" className="text-xl font-display font-black tracking-tighter hover:scale-105 transition-transform">
+            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">KaiDeveloper</span>
           </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden items-center gap-8 md:flex">
+          <div className="hidden items-center gap-8 md:flex glass px-8 py-3 rounded-full">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 to={link.href}
                 className={cn(
-                  "text-xs font-bold uppercase tracking-widest transition-colors",
-                  location.pathname === link.href ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                  "text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:-translate-y-0.5",
+                  location.pathname === link.href ? "text-primary drop-shadow-sm" : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 {link.name}
               </Link>
             ))}
-            <div className="flex items-center gap-4 border-l border-border pl-8">
+            <div className="flex items-center gap-5 border-l border-border/50 pl-6 ml-2">
               <Link
                 to="/login"
                 className={cn(
-                  "text-xs font-bold uppercase tracking-widest transition-colors",
+                  "text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:-translate-y-0.5",
                   location.pathname === '/login' ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )}
               >
@@ -75,9 +75,9 @@ export default function Navbar() {
               </Link>
               <button
                 onClick={() => setIsDark(!isDark)}
-                className="text-muted-foreground transition-colors hover:text-foreground"
+                className="text-muted-foreground transition-all hover:text-foreground hover:rotate-12"
               >
-                {isDark ? <Sun size={18} /> : <Moon size={18} />}
+                {isDark ? <Sun size={16} /> : <Moon size={16} />}
               </button>
             </div>
           </div>

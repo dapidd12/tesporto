@@ -79,9 +79,9 @@ export default function Contact() {
             <div className="space-y-4">
               <a
                 href={`mailto:${email}`}
-                className="group flex items-center gap-5 rounded-3xl border border-border/50 bg-card/50 backdrop-blur-sm p-6 transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1"
+                className="glass-card group flex items-center gap-5 rounded-3xl p-6 transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1"
               >
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-500 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-500 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground shadow-inner">
                   <Mail size={24} />
                 </div>
                 <div>
@@ -94,9 +94,9 @@ export default function Contact() {
                 href={`https://wa.me/${whatsapp}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center gap-5 rounded-3xl border border-border/50 bg-card/50 backdrop-blur-sm p-6 transition-all duration-500 hover:border-green-500/50 hover:shadow-2xl hover:shadow-green-500/10 hover:-translate-y-1"
+                className="glass-card group flex items-center gap-5 rounded-3xl p-6 transition-all duration-500 hover:border-green-500/50 hover:shadow-2xl hover:shadow-green-500/10 hover:-translate-y-1"
               >
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-green-500/10 text-green-500 transition-all duration-500 group-hover:scale-110 group-hover:bg-green-500 group-hover:text-white">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-green-500/10 text-green-500 transition-all duration-500 group-hover:scale-110 group-hover:bg-green-500 group-hover:text-white shadow-inner">
                   <MessageSquare size={24} />
                 </div>
                 <div>
@@ -115,7 +115,7 @@ export default function Contact() {
                     href={social.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex h-14 w-14 items-center justify-center rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-500 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20 active:scale-95"
+                    className="glass-card group flex h-14 w-14 items-center justify-center rounded-2xl transition-all duration-500 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20 active:scale-95"
                     title={social.name}
                   >
                     <div className="transition-transform duration-500 group-hover:scale-110">
@@ -151,7 +151,7 @@ export default function Contact() {
               )}
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5 rounded-[2.5rem] border border-border/50 bg-card/50 backdrop-blur-xl p-8 shadow-xl shadow-black/5 dark:shadow-black/20">
+            <form onSubmit={handleSubmit} className="glass-card space-y-5 rounded-[2.5rem] p-8 shadow-xl shadow-black/5 dark:shadow-black/20">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-2">Nama</label>

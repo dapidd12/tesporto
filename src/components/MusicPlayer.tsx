@@ -103,7 +103,7 @@ export default function MusicPlayer() {
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsExpanded(!isExpanded)}
           className={cn(
-            "flex h-12 w-12 items-center justify-center rounded-full border border-border/50 bg-background/80 shadow-lg backdrop-blur-xl transition-all duration-500",
+            "glass-card flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all duration-500",
             isPlaying ? "text-primary border-primary/30" : "text-muted-foreground"
           )}
         >
@@ -137,7 +137,7 @@ export default function MusicPlayer() {
               initial={{ x: -20, opacity: 0, scale: 0.95 }}
               animate={{ x: 0, opacity: 1, scale: 1 }}
               exit={{ x: -20, opacity: 0, scale: 0.95 }}
-              className="flex items-center gap-4 rounded-full border border-border/50 bg-background/80 p-2 pr-6 shadow-xl backdrop-blur-xl"
+              className="glass-card flex items-center gap-4 rounded-full p-2 pr-6 shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-2">

@@ -91,7 +91,7 @@ export default function Testimonials() {
               }}
               className="absolute inset-0 flex w-full items-center justify-center"
             >
-              <div className="group relative w-full max-w-3xl rounded-[2.5rem] border border-border/50 bg-card/50 p-8 shadow-xl shadow-black/5 backdrop-blur-xl transition-all duration-500 hover:border-primary/30 hover:shadow-primary/10 dark:shadow-black/20 md:p-12">
+              <div className="glass-card group relative w-full max-w-3xl rounded-[2.5rem] p-8 transition-all duration-500 hover:border-primary/30 hover:shadow-primary/10 md:p-12">
                 <Quote className="absolute -top-6 left-8 h-12 w-12 text-primary/20 transition-transform duration-500 group-hover:scale-110 group-hover:text-primary/40 md:-left-6 md:top-8" />
                 
                 <div className="flex flex-col items-center gap-8 md:flex-row md:gap-12">

@@ -510,7 +510,7 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        <div className="mb-8 flex overflow-x-auto pb-4 gap-2 border-b border-border hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+        <div className="mb-8 flex flex-wrap justify-center gap-2 border-b border-border/50 pb-6">
           {[
             { id: 'profile', label: 'Profil', icon: User },
             { id: 'projects', label: 'Projects', icon: Briefcase },
@@ -526,10 +526,10 @@ export default function AdminDashboard() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${
+              className={`flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold transition-all ${
                 activeTab === tab.id 
-                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' 
-                  : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105' 
+                  : 'bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground hover:scale-105'
               }`}
             >
               <tab.icon size={14} /> {tab.label}
@@ -676,6 +676,16 @@ export default function AdminDashboard() {
                     value={profile.marqueeSpeed || 30}
                     onChange={e => setProfile({...profile, marqueeSpeed: Number(e.target.value)})}
                     className="rounded-xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5 md:col-span-2">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Teks Footer / Credit</label>
+                  <input
+                    type="text"
+                    value={profile.footerText || ''}
+                    onChange={e => setProfile({...profile, footerText: e.target.value})}
+                    className="rounded-xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
+                    placeholder="© 2026 All Rights Reserved."
                   />
                 </div>
               </div>

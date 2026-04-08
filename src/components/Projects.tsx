@@ -128,13 +128,13 @@ export default function Projects({ limit, hideFilter = false }: ProjectsProps) {
                 transition={{ duration: 0.4 }}
                 className="group relative flex flex-col gap-6"
               >
-                <div className="relative aspect-[16/10] overflow-hidden rounded-[2rem] border border-border bg-muted/20 dark:bg-muted/5 transition-all duration-500 group-hover:border-primary/50 group-hover:shadow-2xl group-hover:shadow-primary/20">
-                  <div className="absolute inset-0 flex items-center justify-center bg-foreground/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100 backdrop-blur-[2px] z-10">
+                <div className="relative aspect-[16/10] overflow-hidden rounded-[2rem] border border-border/50 bg-muted/20 dark:bg-muted/5 transition-all duration-500 group-hover:border-primary/50 group-hover:shadow-2xl group-hover:shadow-primary/20">
+                  <div className="absolute inset-0 flex items-center justify-center bg-foreground/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100 backdrop-blur-sm z-10">
                     <a
                       href={project.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-[10px] font-black uppercase tracking-widest text-background transition-transform hover:scale-110 active:scale-95"
+                      className="flex items-center gap-2 rounded-full bg-background px-6 py-3 text-[10px] font-black uppercase tracking-widest text-foreground transition-transform hover:scale-110 active:scale-95 shadow-xl"
                     >
                       Kunjungi Situs <ExternalLink size={14} />
                     </a>
@@ -153,33 +153,34 @@ export default function Projects({ limit, hideFilter = false }: ProjectsProps) {
                   )}
                 </div>
                 
-                <div className="space-y-4 px-2">
+                <div className="glass-card rounded-3xl p-6 space-y-4 mt-[-2rem] relative z-20 mx-4 transition-transform duration-500 group-hover:-translate-y-2">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-3xl font-display font-black tracking-tighter">{project.name}</h3>
-                    <span className="rounded-full border border-border bg-muted/50 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-muted-foreground">
+                    <h3 className="text-2xl font-display font-black tracking-tight group-hover:text-primary transition-colors">{project.name}</h3>
+                    <span className="rounded-full border border-border bg-background/50 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-muted-foreground">
                       Project
                     </span>
                   </div>
-                  <p className="text-base font-medium leading-relaxed text-muted-foreground">
+                  <p className="text-sm font-medium leading-relaxed text-muted-foreground line-clamp-3">
                     {project.description}
                   </p>
                   {project.tags && project.tags.length > 0 && (
                     <div className="flex flex-wrap gap-2">
-                      {project.tags.map((tag, index) => (
-                        <span key={index} className="rounded-md bg-primary/10 px-2 py-1 text-xs font-bold text-primary">
+                      {project.tags.map((tag: string, index: number) => (
+                        <span key={index} className="rounded-md bg-primary/10 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
                           {tag}
                         </span>
                       ))}
                     </div>
                   )}
-                  <div className="flex gap-4 pt-1">
+                  <div className="flex gap-4 pt-2">
                     <a
                       href={project.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-primary transition-all hover:gap-4"
+                      className="group/link inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary transition-all hover:gap-4"
                     >
-                      View Live <ExternalLink size={16} />
+                      <span>View Live</span>
+                      <ExternalLink className="transition-transform group-hover/link:-rotate-12" size={14} />
                     </a>
                   </div>
                   <ProjectComments projectId={project.id} />

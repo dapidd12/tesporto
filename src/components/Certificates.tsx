@@ -51,9 +51,9 @@ export default function Certificates() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className={`group flex flex-col justify-between overflow-hidden rounded-[2rem] border border-border bg-card transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-${colorClass}/10 hover:border-${colorClass}/50`}
+                className={`glass-card group flex flex-col justify-between overflow-hidden rounded-[2rem] transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-${colorClass}/10 hover:border-${colorClass}/50`}
               >
-                <div className="relative aspect-[4/3] w-full overflow-hidden border-b border-border bg-muted/50">
+                <div className="relative aspect-[4/3] w-full overflow-hidden border-b border-border/50 bg-muted/20">
                   {/* PDF Preview using iframe */}
                   <div className="absolute inset-0 z-0 opacity-50 transition-opacity duration-500 group-hover:opacity-100">
                     {cert.url && (
@@ -65,10 +65,10 @@ export default function Certificates() {
                       />
                     )}
                   </div>
-                  <div className="absolute inset-0 z-10 bg-gradient-to-t from-card to-transparent" />
+                  <div className="absolute inset-0 z-10 bg-gradient-to-t from-background/80 to-transparent" />
                   
                   <div className="absolute left-6 top-6 z-20">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-${colorClass}/10 text-${colorClass} backdrop-blur-md transition-all duration-500 group-hover:scale-110 group-hover:bg-${colorClass} group-hover:text-white`}>
+                    <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-${colorClass}/10 text-${colorClass} backdrop-blur-md transition-all duration-500 group-hover:scale-110 group-hover:bg-${colorClass} group-hover:text-white shadow-inner`}>
                       <FileText size={24} />
                     </div>
                   </div>
@@ -87,7 +87,7 @@ export default function Certificates() {
                       href={cert.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-muted/50 px-4 py-3 text-xs font-black uppercase tracking-widest transition-all hover:scale-[1.02] hover:bg-primary hover:text-primary-foreground hover:border-primary active:scale-95"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border/50 bg-background/50 px-4 py-3 text-xs font-black uppercase tracking-widest transition-all hover:scale-[1.02] hover:bg-primary hover:text-primary-foreground hover:border-primary active:scale-95"
                     >
                       Lihat Sertifikat <ExternalLink size={14} />
                     </a>

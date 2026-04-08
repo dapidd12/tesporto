@@ -9,22 +9,23 @@ export default function Footer() {
 
   const name = profile?.name || '';
   const location = profile?.location || '';
+  const footerText = profile?.footerText || `© ${new Date().getFullYear()} All Rights Reserved.`;
 
   return (
-    <footer className="border-t border-gray-200 px-6 py-6 dark:border-white/10 md:px-12">
+    <footer className="border-t border-border/50 px-6 py-8 md:px-12 bg-muted/20 dark:bg-muted/5 backdrop-blur-sm">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 md:flex-row">
         <div className="text-center md:text-left">
-          <p className="text-xl font-display font-bold tracking-tighter">{name.toUpperCase()}</p>
-          <p className="text-sm text-gray-500">© {new Date().getFullYear()} All Rights Reserved.</p>
+          <p className="text-xl font-display font-black tracking-tighter bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">{name.toUpperCase()}</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-1">{footerText}</p>
         </div>
         
-        <div className="flex gap-8 text-sm font-medium text-gray-500">
-          <Link to="/about" className="hover:text-primary">About</Link>
-          <Link to="/projects" className="hover:text-primary">Projects</Link>
-          <Link to="/contact" className="hover:text-primary">Contact</Link>
+        <div className="flex gap-8 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+          <Link to="/about" className="hover:text-primary transition-colors">About</Link>
+          <Link to="/projects" className="hover:text-primary transition-colors">Projects</Link>
+          <Link to="/contact" className="hover:text-primary transition-colors">Contact</Link>
         </div>
 
-        <p className="text-sm text-gray-400">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
           Built in {location.split(',')[0]}
         </p>
       </div>

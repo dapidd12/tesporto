@@ -33,14 +33,18 @@ export default function About() {
             {summary}
           </p>
 
-          <div className="grid grid-cols-1 gap-4 pt-6 md:grid-cols-2">
-            <div className="group rounded-2xl border border-border bg-card p-6 transition-all hover:border-primary/30 hover:shadow-lg">
-              <h3 className="mb-2 text-sm font-black uppercase tracking-widest text-primary">Domisili</h3>
-              <p className="text-lg font-bold text-foreground">{location}</p>
+          <div className="grid grid-cols-1 gap-6 pt-8 md:grid-cols-2">
+            <div className="glass-card group rounded-[2rem] p-8 transition-all hover:-translate-y-2 duration-500">
+              <h3 className="mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-primary" /> Domisili
+              </h3>
+              <p className="text-xl font-display font-bold text-foreground">{location}</p>
             </div>
-            <div className="group rounded-2xl border border-border bg-card p-6 transition-all hover:border-secondary/30 hover:shadow-lg">
-              <h3 className="mb-2 text-sm font-black uppercase tracking-widest text-secondary">Status</h3>
-              <p className="text-lg font-bold text-foreground">{status}</p>
+            <div className="glass-card group rounded-[2rem] p-8 transition-all hover:-translate-y-2 duration-500">
+              <h3 className="mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-secondary flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-secondary" /> Status
+              </h3>
+              <p className="text-xl font-display font-bold text-foreground">{status}</p>
             </div>
           </div>
         </motion.div>

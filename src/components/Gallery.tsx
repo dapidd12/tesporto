@@ -67,9 +67,11 @@ export default function Gallery() {
                     <ImageIcon size={48} className="opacity-20" />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                <div className="absolute bottom-0 left-0 w-full translate-y-4 p-6 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                  <h3 className="text-lg font-bold text-white">{item.title}</h3>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100 backdrop-blur-[2px]" />
+                <div className="absolute bottom-0 left-0 w-full translate-y-4 p-6 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+                  <div className="glass-card rounded-xl p-4 border-white/10 bg-white/10 dark:bg-black/20">
+                    <h3 className="text-lg font-bold text-white drop-shadow-md">{item.title}</h3>
+                  </div>
                 </div>
               </motion.div>
             ))}
