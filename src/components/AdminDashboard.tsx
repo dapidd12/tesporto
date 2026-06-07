@@ -485,10 +485,10 @@ export default function AdminDashboard() {
   }
 
   return (
-    <section className="min-h-screen px-4 py-12 md:px-12 md:py-24">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-8 flex flex-col gap-6 md:mb-12 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-background pt-24 pb-12">
+      <div className="mx-auto max-w-[1400px] px-6">
+        <div className="mb-8 flex flex-col gap-6 md:mb-8 md:flex-row md:items-center md:justify-between border-b border-border/50 pb-6">
+          <div className="flex items-center justify-between mt-8 md:mt-2">
             <div>
               <h1 className="text-3xl font-display font-black tracking-tighter md:text-4xl">Admin Dashboard</h1>
               <p className="text-xs text-muted-foreground md:text-sm">Kelola konten portofolio Anda</p>
@@ -510,33 +510,37 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        <div className="mb-8 flex flex-wrap justify-center gap-2 border-b border-border/50 pb-6">
-          {[
-            { id: 'profile', label: 'Profil', icon: User },
-            { id: 'projects', label: 'Projects', icon: Briefcase },
-            { id: 'certificates', label: 'Certs', icon: Award },
-            { id: 'skills', label: 'Skills', icon: Plus },
-            { id: 'socials', label: 'Socials', icon: Plus },
-            { id: 'testimonials', label: 'Testimoni', icon: Plus },
-            { id: 'announcements', label: 'News', icon: Bell },
-            { id: 'gallery', label: 'Gallery', icon: ImageIcon },
-            { id: 'playlist', label: 'Music', icon: Music },
-            { id: 'comments', label: 'Comments', icon: MessageCircle },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold transition-all ${
-                activeTab === tab.id 
-                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105' 
-                  : 'bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground hover:scale-105'
-              }`}
-            >
-              <tab.icon size={14} /> {tab.label}
-            </button>
-          ))}
+        {/* Admin Navigation (Simpel ala Public Navbar) */}
+        <div className="sticky top-0 z-40 -mx-6 px-6 py-4 bg-background/80 backdrop-blur-xl border-b border-border/50 mb-8 overflow-x-auto hide-scrollbar shadow-sm">
+          <div className="flex items-center gap-8 min-w-max mx-auto max-w-[1400px]">
+             {[
+                { id: 'profile', label: 'Profil' },
+                { id: 'projects', label: 'Projects' },
+                { id: 'certificates', label: 'Certs' },
+                { id: 'skills', label: 'Skills' },
+                { id: 'socials', label: 'Socials' },
+                { id: 'testimonials', label: 'Testimoni' },
+                { id: 'announcements', label: 'News' },
+                { id: 'gallery', label: 'Gallery' },
+                { id: 'playlist', label: 'Music' },
+                { id: 'comments', label: 'Comments' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:-translate-y-0.5 whitespace-nowrap ${
+                    activeTab === tab.id 
+                      ? 'text-primary border-b-2 border-primary pb-1' 
+                      : 'text-muted-foreground hover:text-foreground pb-1'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+          </div>
         </div>
 
+        {/* Main Content */}
         <div className="space-y-6 md:space-y-8">
           {activeTab === 'profile' && (
             <div className="rounded-[1.5rem] border border-border bg-card p-5 shadow-xl md:rounded-[2rem] md:p-8">
@@ -1358,6 +1362,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
-    </section>
+    </div>
   );
 }

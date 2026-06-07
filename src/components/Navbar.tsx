@@ -4,12 +4,15 @@ import { Moon, Sun, Menu, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { useProfile } from '../hooks/useContent';
+import { auth } from '../firebase';
+import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 
 export default function Navbar() {
   const { profile } = useProfile();
   const [isDark, setIsDark] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<FirebaseUser | null>(null);
   const location = useLocation();
 
   const nickname = profile?.nickname || '';
@@ -25,6 +28,13 @@ export default function Navbar() {
     else document.documentElement.classList.remove('dark');
   }, [isDark]);
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'About', href: '/about' },
@@ -35,6 +45,23 @@ export default function Navbar() {
   ];
 
   if (location.pathname === '/admin') return null;
+  if (location.pathname === '/login') {
+    return (
+      <nav className="fixed left-0 right-0 top-0 z-50 bg-transparent py-6">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
+          <Link to="/" className="text-xl font-display font-black tracking-tighter hover:scale-105 transition-transform">
+            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">KaiDeveloper</span>
+          </Link>
+          <button
+            onClick={() => setIsDark(!isDark)}
+            className="text-muted-foreground transition-all hover:text-foreground hover:rotate-12"
+          >
+            {isDark ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <>
@@ -65,10 +92,10 @@ export default function Navbar() {
             ))}
             <div className="flex items-center gap-5 border-l border-border/50 pl-6 ml-2">
               <Link
-                to="/login"
+                to={user ? "/admin" : "/login"}
                 className={cn(
                   "text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:-translate-y-0.5",
-                  location.pathname === '/login' ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                  (location.pathname === '/login' || location.pathname === '/admin') ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 Admin
@@ -121,7 +148,7 @@ export default function Navbar() {
                 </Link>
               ))}
               <Link
-                to="/login"
+                to={user ? "/admin" : "/login"}
                 onClick={() => setMobileMenuOpen(false)}
                 className="mt-4 text-xl font-bold text-primary"
               >

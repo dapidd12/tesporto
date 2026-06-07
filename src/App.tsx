@@ -27,40 +27,11 @@ import Announcements from './components/Announcements';
 import Gallery from './components/Gallery';
 import News from './components/News';
 import MusicPlayer from './components/MusicPlayer';
+import ProtectedRoute from './components/ProtectedRoute';
+import NotFound from './components/NotFound';
 import { AnimatePresence } from 'motion/react';
 
 import { Toaster } from 'sonner';
-
-const AntiInspect = () => {
-  React.useEffect(() => {
-    const handleContextMenu = (e: MouseEvent) => {
-      e.preventDefault();
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Prevent F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, Ctrl+Shift+C
-      if (
-        e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-        (e.ctrlKey && e.shiftKey && e.key === 'J') ||
-        (e.ctrlKey && e.shiftKey && e.key === 'C') ||
-        (e.ctrlKey && e.key === 'U')
-      ) {
-        e.preventDefault();
-      }
-    };
-
-    document.addEventListener('contextmenu', handleContextMenu);
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('contextmenu', handleContextMenu);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
-
-  return null;
-};
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -131,10 +102,13 @@ const AnimatedRoutes = () => {
           </PageWrapper>
         } />
         <Route path="/admin" element={
-          <PageWrapper>
-            <AdminDashboard />
-          </PageWrapper>
+          <ProtectedRoute>
+            <PageWrapper>
+              <AdminDashboard />
+            </PageWrapper>
+          </ProtectedRoute>
         } />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
   );
@@ -145,7 +119,6 @@ export default function App() {
     <Router>
       <SmoothScroll>
         <div className="relative min-h-screen overflow-x-hidden selection:bg-primary selection:text-white">
-          <AntiInspect />
           <Toaster position="top-center" richColors />
           <Preloader />
           <CustomCursor />
