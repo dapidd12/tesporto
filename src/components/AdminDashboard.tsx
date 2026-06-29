@@ -3,8 +3,8 @@ import { motion } from 'motion/react';
 import { auth, db } from '../firebase';
 import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, Timestamp } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
-import { LogOut, Plus, Trash2, Edit, Save, X, Briefcase, Award, Bell, Image as ImageIcon, Music, User, MessageCircle } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { LogOut, Plus, Trash2, Edit, Save, X, Briefcase, Award, Bell, Image as ImageIcon, Music, User, MessageCircle, Menu, ArrowLeft } from 'lucide-react';
 import { handleFirestoreError, OperationType } from '../lib/firestoreError';
 import { toast } from 'sonner';
 
@@ -35,7 +35,19 @@ export default function AdminDashboard() {
     marqueeSpeed: 30
   });
   const [loading, setLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   const [isEditingProject, setIsEditingProject] = useState<string | null>(null);
   const [editProjectForm, setEditProjectForm] = useState<any>({});
   
@@ -485,63 +497,104 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-24 pb-12">
-      <div className="mx-auto max-w-[1400px] px-6">
-        <div className="mb-8 flex flex-col gap-6 md:mb-8 md:flex-row md:items-center md:justify-between border-b border-border/50 pb-6">
-          <div className="flex items-center justify-between mt-8 md:mt-2">
-            <div>
-              <h1 className="text-3xl font-display font-black tracking-tighter md:text-4xl">Admin Dashboard</h1>
-              <p className="text-xs text-muted-foreground md:text-sm">Kelola konten portofolio Anda</p>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500/10 text-red-500 transition-colors hover:bg-red-500 hover:text-white md:hidden"
-              title="Logout"
-            >
-              <LogOut size={18} />
-            </button>
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Sidebar Overlay (Mobile) */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar Navigation */}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-slate-50 dark:bg-slate-900 shadow-[4px_0_24px_rgba(0,0,0,0.05)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.4)] border-r border-slate-200 dark:border-slate-800 transition-transform lg:translate-x-0 flex flex-col ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="h-20 shrink-0 flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-800">
+             <div className="flex items-center gap-3">
+                <div className="h-10 w-10 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                   {profile?.name?.charAt(0) || 'A'}
+                </div>
+                <div className="truncate min-w-0">
+                   <h2 className="font-display font-bold text-sm truncate">{profile?.name || 'KaiDeveloper'}</h2>
+                   <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Admin Area</p>
+                </div>
+             </div>
+             <button onClick={() => setMobileMenuOpen(false)} className="lg:hidden text-muted-foreground hover:text-foreground transition-colors">
+               <X size={20} />
+             </button>
+          </div>
+
+          {/* User Role Card */}
+          <div className="px-6 py-6 shrink-0">
+             <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 p-4 text-center shadow-sm">
+                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-3">Your Role</p>
+                 <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-[10px] font-black tracking-widest text-primary uppercase">
+                   Developer
+                 </span>
+             </div>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="flex-1 overflow-y-auto px-4 space-y-1 pb-4 overscroll-contain" data-lenis-prevent="true">
+             {[
+               { id: 'profile', label: 'Profil Akun', icon: User },
+               { id: 'projects', label: 'Kelola Projects', icon: Briefcase },
+               { id: 'certificates', label: 'Kelola Prestasi', icon: Award },
+               { id: 'skills', label: 'Kelola Skills', icon: Plus },
+               { id: 'socials', label: 'Kelola Socials', icon: Plus },
+               { id: 'testimonials', label: 'Kelola Testimoni', icon: Plus },
+               { id: 'announcements', label: 'Kelola Berita', icon: Bell },
+               { id: 'gallery', label: 'Kelola Galeri', icon: ImageIcon },
+               { id: 'playlist', label: 'Kelola Musik', icon: Music },
+               { id: 'comments', label: 'Kelola Users', icon: MessageCircle },
+             ].map(tab => (
+                 <button
+                   key={tab.id}
+                   onClick={() => { setActiveTab(tab.id); setMobileMenuOpen(false); }}
+                   className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all ${activeTab === tab.id ? 'bg-primary shadow-lg shadow-primary/20 text-primary-foreground' : 'text-muted-foreground hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-foreground'}`}
+                 >
+                    <tab.icon className="shrink-0" size={18} /> {tab.label}
+                 </button>
+             ))}
+          </nav>
+
+          {/* Bottom Actions */}
+          <div className="p-4 border-t border-slate-200 dark:border-slate-800 space-y-2 shrink-0 bg-white dark:bg-slate-900/50">
+             <Link 
+                to="/" 
+                className="w-full flex items-center justify-center gap-2 rounded-xl border border-border/50 bg-transparent px-4 py-3 text-xs font-bold text-muted-foreground hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-foreground transition-all"
+             >
+                <ArrowLeft size={16} /> Ke Website
+             </Link>
+             <button 
+                onClick={handleLogout} 
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-red-500/10 px-4 py-3 text-xs font-bold text-red-500 hover:bg-red-500 hover:text-white transition-all"
+             >
+                <LogOut size={16} /> Logout
+             </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <main className="lg:pl-72 flex flex-col min-w-0 min-h-screen">
+          <div className="h-20 shrink-0 flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-800 lg:hidden sticky top-0 bg-slate-50 dark:bg-slate-900 z-30 shadow-sm">
+              <div className="flex items-center gap-3">
+                  <button onClick={() => setMobileMenuOpen(true)} className="text-muted-foreground hover:text-foreground transition-colors p-2 -ml-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
+                     <Menu size={24} />
+                  </button>
+                  <h1 className="font-display font-bold text-sm tracking-tight"><span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Admin Dashboard</span></h1>
+              </div>
           </div>
           
-          <button
-            onClick={handleLogout}
-            className="hidden items-center justify-center gap-2 rounded-full bg-red-500/10 px-6 py-3 text-sm font-bold text-red-500 transition-colors hover:bg-red-500 hover:text-white md:flex"
-          >
-            <LogOut size={18} /> Logout
-          </button>
-        </div>
+          <div className="p-6 lg:p-10 max-w-6xl mx-auto w-full">
+            <div className="mb-8 hidden lg:block">
+              <h1 className="text-3xl font-display font-black tracking-tighter md:text-4xl">Dashboard</h1>
+              <p className="text-xs text-muted-foreground md:text-sm mt-1">Kelola konten portofolio Anda dari sini.</p>
+            </div>
 
-        {/* Admin Navigation (Simpel ala Public Navbar) */}
-        <div className="sticky top-0 z-40 -mx-6 px-6 py-4 bg-background/80 backdrop-blur-xl border-b border-border/50 mb-8 overflow-x-auto hide-scrollbar shadow-sm">
-          <div className="flex items-center gap-8 min-w-max mx-auto max-w-[1400px]">
-             {[
-                { id: 'profile', label: 'Profil' },
-                { id: 'projects', label: 'Projects' },
-                { id: 'certificates', label: 'Certs' },
-                { id: 'skills', label: 'Skills' },
-                { id: 'socials', label: 'Socials' },
-                { id: 'testimonials', label: 'Testimoni' },
-                { id: 'announcements', label: 'News' },
-                { id: 'gallery', label: 'Gallery' },
-                { id: 'playlist', label: 'Music' },
-                { id: 'comments', label: 'Comments' },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:-translate-y-0.5 whitespace-nowrap ${
-                    activeTab === tab.id 
-                      ? 'text-primary border-b-2 border-primary pb-1' 
-                      : 'text-muted-foreground hover:text-foreground pb-1'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="space-y-6 md:space-y-8">
+            <div className="space-y-6 md:space-y-8">
           {activeTab === 'profile' && (
             <div className="rounded-[1.5rem] border border-border bg-card p-5 shadow-xl md:rounded-[2rem] md:p-8">
               <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -1346,8 +1399,9 @@ export default function AdminDashboard() {
               </div>
             </div>
           )}
+          </div>
         </div>
-      </div>
+      </main>
 
       {/* Delete Confirmation Modal */}
       {confirmDelete && (
